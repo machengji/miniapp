@@ -1,0 +1,222 @@
+page {
+  background-color: #121212; // 极深灰，接近黑
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 20rpx;
+  box-sizing: border-box;
+  padding-bottom: 40rpx;
+  padding-top: 100px; // Adjust based on nav bar
+}
+
+.intro-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10vh;
+  opacity: 0.8;
+  
+  .logo {
+    font-size: 80rpx;
+    font-weight: 200;
+    color: #a8a8a8;
+    border: 1px solid #a8a8a8;
+    width: 120rpx;
+    height: 120rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 40rpx;
+    font-family: 'Times New Roman', serif;
+  }
+
+  .title {
+    font-size: 40rpx;
+    font-weight: 600;
+    margin-bottom: 20rpx;
+    letter-spacing: 2rpx;
+  }
+
+  .subtitle {
+    font-size: 28rpx;
+    color: #888;
+    margin-bottom: 40rpx;
+  }
+
+  .desc {
+    font-size: 26rpx;
+    color: #666;
+    text-align: center;
+    max-width: 60%;
+    line-height: 1.6;
+  }
+}
+
+.message-group {
+  margin-bottom: 40rpx;
+  display: flex;
+  width: 100%;
+  
+  &.user {
+    justify-content: flex-end;
+  }
+  
+  &.ai {
+    justify-content: flex-start;
+  }
+}
+
+.avatar {
+  width: 60rpx;
+  height: 60rpx;
+  background: #2a2a2a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #888;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  margin-top: 10rpx;
+}
+
+.content-wrapper {
+  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble {
+  padding: 24rpx 32rpx;
+  border-radius: 20rpx;
+  font-size: 30rpx;
+  line-height: 1.6;
+  position: relative;
+  word-break: break-all;
+  
+  &.user-bubble {
+    background-color: #333;
+    color: #fff;
+    border-top-right-radius: 4rpx;
+  }
+  
+  &.ai-bubble {
+    background-color: transparent;
+    color: #d1d1d1;
+    padding-left: 0;
+    margin-top: 10rpx;
+  }
+}
+
+// 核心：思维链样式
+.thought-chain {
+  background: #1e1e1e;
+  border-radius: 12rpx;
+  border: 1px solid #333;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  width: 100%;
+  
+  .thought-header {
+    display: flex;
+    align-items: center;
+    padding: 16rpx 20rpx;
+    font-size: 24rpx;
+    color: #666;
+    background: #252525;
+    
+    .icon-brain {
+      margin-right: 12rpx;
+      color: #8a6dff; // 神秘紫
+      animation: pulse 3s infinite;
+    }
+    
+    .toggle-icon {
+      margin-left: auto;
+      transition: transform 0.3s;
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  
+  .thought-content {
+    padding: 20rpx;
+    font-size: 24rpx;
+    color: #888;
+    font-family: monospace;
+    border-top: 1px solid #333;
+    background: #1a1a1a;
+    line-height: 1.5;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  width: 10rpx;
+  height: 30rpx;
+  background: #8a6dff;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 8rpx;
+}
+
+.input-area {
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #333;
+  
+  .chat-input {
+    flex: 1;
+    background: #2a2a2a;
+    color: #fff;
+    padding: 20rpx 30rpx;
+    border-radius: 40rpx;
+    margin-right: 20rpx;
+    font-size: 30rpx;
+  }
+  
+  .input-placeholder {
+    color: #555;
+  }
+  
+  .send-btn {
+    width: 80rpx;
+    height: 80rpx;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: all 0.2s;
+    
+    &.active {
+      background: #8a6dff;
+      color: #fff;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; text-shadow: 0 0 10rpx rgba(138, 109, 255, 0.5); }
+  100% { opacity: 0.5; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

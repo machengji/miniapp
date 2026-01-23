@@ -1,0 +1,64 @@
+<navigation-bar title="Aletheia" back="{{false}}" color="white" background="#1a1a1a"></navigation-bar>
+
+<scroll-view class="chat-container" scroll-y="true" scroll-into-view="{{scrollTarget}}" enable-flex="true">
+  <view class="intro-card" wx:if="{{messages.length === 0}}">
+    <view class="logo">A</view>
+    <view class="title">Project Aletheia</view>
+    <view class="subtitle">我是你的深层心理观察者。</view>
+    <view class="desc">我不预测未来，我只解读你的潜意识。请告诉我一个梦境，或者一件让你情绪波动的小事。</view>
+  </view>
+
+  <block wx:for="{{messages}}" wx:key="id">
+    <!-- User Message -->
+    <view class="message-group user" wx:if="{{item.role === 'user'}}">
+      <view class="bubble user-bubble">
+        <text user-select="true">{{item.content}}</text>
+      </view>
+    </view>
+
+    <!-- AI Message -->
+    <view class="message-group ai" wx:if="{{item.role === 'assistant'}}">
+      <view class="avatar">A</view>
+      <view class="content-wrapper">
+        
+        <!-- Thinking/Reasoning Block (The "CoT" Visualization) -->
+        <view class="thought-chain" wx:if="{{item.thought}}" bindtap="toggleThought" data-id="{{item.id}}">
+          <view class="thought-header">
+            <view class="icon-brain">✦</view> 
+            <text>深度分析回路 (Deep Trace)</text>
+            <view class="toggle-icon {{item.isThoughtExpanded ? 'expanded' : ''}}">▼</view>
+          </view>
+          <view class="thought-content" wx:if="{{item.isThoughtExpanded}}">
+            <text user-select="true">{{item.thought}}</text>
+          </view>
+        </view>
+
+        <!-- Final Response -->
+        <view class="bubble ai-bubble">
+          <text user-select="true">{{item.content}}</text>
+          <view class="cursor" wx:if="{{item.isStreaming}}">▍</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Invisible anchor for auto-scroll -->
+  <view id="bottom-anchor" style="height: 20rpx;"></view>
+</scroll-view>
+
+<view class="input-area">
+  <input 
+    class="chat-input" 
+    type="text" 
+    confirm-type="send" 
+    placeholder="输入梦境、困惑或记忆..." 
+    placeholder-class="input-placeholder"
+    value="{{inputValue}}"
+    bindinput="onInput"
+    bindconfirm="sendMessage"
+    disabled="{{isStreaming}}"
+  />
+  <view class="send-btn {{inputValue.length > 0 ? 'active' : ''}}" bindtap="sendMessage">
+    ↑
+  </view>
+</view>
