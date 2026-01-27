@@ -37,43 +37,49 @@ const SYSTEM_PROMPT = `
 exports.main = async (event, context) => {
   const { messages } = event
   
-  // 获取混元模型管理器
-  // 注意：实际使用需确保基础库版本支持，或使用云调用 API
-  const { LLM } = cloud.extend.AI
-  
   try {
-    // 调用混元大模型 (Hunyuan)
-    // 这里使用了假设的云开发 AI 扩展能力写法，实际部署时请参考官方最新文档
-    // 如果 SDK 尚未支持 extend.AI，可使用 standard http request to Hunyuan API
-    
-    /* 
-       由于我们是在模拟环境，且目标是“零成本接入”，
-       通常微信云开发会提供一个 runAI 或类似的接口。
-       这里我们编写一个通用的调用逻辑。
-    */
+    // 获取混元模型管理器
+    // 注意：实际使用需确保基础库版本支持，或使用云调用 API
+    // 检查 cloud.extend 和 cloud.extend.AI 是否存在
+    if (cloud.extend && cloud.extend.AI && typeof cloud.callAI === 'function') {
+      const { LLM } = cloud.extend.AI
+      
+      // 调用混元大模型 (Hunyuan)
+      // 这里使用了假设的云开发 AI 扩展能力写法，实际部署时请参考官方最新文档
+      // 如果 SDK 尚未支持 extend.AI，可使用 standard http request to Hunyuan API
+      
+      /* 
+         由于我们是在模拟环境，且目标是“零成本接入”，
+         通常微信云开发会提供一个 runAI 或类似的接口。
+         这里我们编写一个通用的调用逻辑。
+      */
 
-    const modelResponse = await cloud.callAI({
-       name: 'hunyuan_pro', // 假设的模型名称，根据官方文档调整
-       messages: [
-         { role: 'system', content: SYSTEM_PROMPT },
-         ...messages
-       ]
-    })
-    
-    // 如果是流式返回（Stream），云函数通常需要配合云托管实现。
-    // 但为了简化（零成本、低门槛），我们先使用“非流式”等待返回，
-    // 或者利用云函数的 Response Streaming 特性（较高级）。
-    // 
-    // 策略调整：为了确保 MVP 稳定性，我们先做非流式（等待 1-3 秒返回），
-    // 前端显示“分析中...”。
-    // 
-    // 只要 prompt 包含 <think>，我们的 UI 就能渲染出思考效果，
-    // 哪怕是一次性返回的，我们可以在前端模拟打字机效果，把 <think> 和 正文 拆开播放。
-    
-    return {
-      success: true,
-      result: modelResponse.result || "（潜意识连接中... 请检查云函数配置）" 
-      // 这里的 .result 假设是模型直接返回的文本字符串
+      const modelResponse = await cloud.callAI({
+         name: 'hunyuan_pro', // 假设的模型名称，根据官方文档调整
+         messages: [
+           { role: 'system', content: SYSTEM_PROMPT },
+           ...messages
+         ]
+      })
+      
+      // 如果是流式返回（Stream），云函数通常需要配合云托管实现。
+      // 但为了简化（零成本、低门槛），我们先使用“非流式”等待返回，
+      // 或者利用云函数的 Response Streaming 特性（较高级）。
+      // 
+      // 策略调整：为了确保 MVP 稳定性，我们先做非流式（等待 1-3 秒返回），
+      // 前端显示“分析中...”。
+      // 
+      // 只要 prompt 包含 <think>，我们的 UI 就能渲染出思考效果，
+      // 哪怕是一次性返回的，我们可以在前端模拟打字机效果，把 <think> 和 正文 拆开播放。
+      
+      return {
+        success: true,
+        result: modelResponse.result || "（潜意识连接中... 请检查云函数配置）" 
+        // 这里的 .result 假设是模型直接返回的文本字符串
+      }
+    } else {
+        // AI 能力未配置或 SDK 版本不支持，抛出错误进入 catch 流程（返回 Mock 数据）
+        throw new Error('Cloud AI extension not available');
     }
 
   } catch (err) {

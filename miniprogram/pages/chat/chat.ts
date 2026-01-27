@@ -80,61 +80,67 @@ Page({
       isStreaming: true
     });
 
+    let rawResult = "";
+
     try {
-      // 3. 调用云函数 (Hunyuan)
-      let rawResult = "";
-      
-      try {
-        const res: any = await wx.cloud.callFunction({
-          name: 'analyzeDream',
-          data: {
-            messages: this.data.messages
-              .filter(m => m.role !== 'assistant' || m.content) // 过滤空消息
-              .map(m => ({ role: m.role, content: m.content }))
-          }
-        });
-        rawResult = res.result.result || "";
-      } catch (cloudErr: any) {
-        // [容错处理] 如果云函数未部署 (-501000)，启动本地模拟模式
-        if (cloudErr.errMsg && cloudErr.errMsg.includes('FunctionName parameter could not be found')) {
-            console.warn('⚠️ 检测到云函数 analyzeDream 未部署。已自动切换到本地模拟模式。');
-            console.warn('👉 请在开发者工具中右键点击 cloudfunctions/analyzeDream 文件夹，选择【上传并部署：云端安装依赖】');
-            
-            // 模拟一个荣格风格的回复
-            rawResult = `<think>
-[系统警报] 云端连接未就绪 (Error -501000)。
-[本地推理] 用户输入："${content}"。
-意象分析：监测到用户正在尝试建立连接。
-防御机制：技术性阻断导致了暂时的挫败感。
-策略：启动应急响应协议，提供安抚性反馈。
-</think>
-(本地模拟回复) 我听到了你的声音，但在我们之间似乎还有一层薄纱（云函数尚未部署）。
-
-这就像梦境与现实的边缘——你必须迈出关键的一步：**请在微信开发者工具中，找到 project 根目录下的 cloudfunctions/analyzeDream 文件夹，点击右键，选择“上传并部署：云端安装依赖”。** 
-
-一旦那层薄纱被揭开，我就能真正看见你。`;
-        } else {
-            throw cloudErr; // 其他错误继续抛出
-        }
+      // 3. 直接调用微信云开发 AI 能力 (需要基础库 3.7.1+)
+      if (!wx.cloud.extend || !wx.cloud.extend.AI) {
+        throw new Error('基础库版本过低，请在开发者工具详情-本地设置中切换到 3.7.1 以上版本');
       }
 
-      // 4. 解析结果 (提取 <think> 和正文)
-      const thinkMatch = rawResult.match(/<think>([\s\S]*?)<\/think>/);
-      const thoughtContent = thinkMatch ? thinkMatch[1].trim() : "（无思维链数据）";
-      const finalContent = rawResult.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+      const ai = wx.cloud.extend.AI;
+      const model = ai.createModel('deepseek');
 
-      // 5. 启动前端“伪流式”打字机效果
-      this.simulateStreaming(aiMsgId, thoughtContent, finalContent);
-
-    } catch (err) {
-      console.error(err);
-      this.updateLastMessage({ 
-        thought: '连接断开',
-        content: '分析回路发生错误，请检查网络或云额度。',
-        isStreaming: false
+      const res = await model.generateText({
+        model: 'deepseek-r1-0528',
+        messages: [
+          { role: 'system', content: `
+你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
+在回复用户之前，你必须先进行推理，并将推理过程用 <think> 和 </think> 标签包裹起来放在最前面。
+` },
+          ...this.data.messages
+            .filter(m => m.role === 'user' || (m.role === 'assistant' && m.content)) // 严格过滤
+            .map(m => ({ role: m.role, content: m.content }))
+        ]
       });
-      this.setData({ isStreaming: false });
+      
+      console.log('AI Response:', res); // 调试日志
+
+      if (res.choices && res.choices.length > 0) {
+          rawResult = res.choices[0].message.content || "";
+      } else {
+          console.warn('AI 返回结构异常:', res);
+          throw new Error('AI 返回了空内容');
+      }
+
+    } catch (err: any) {
+      console.error('AI调用失败详情：', err);
+      
+      let errorMsg = err.message || JSON.stringify(err);
+      let advice = "";
+      
+      if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
+          advice = "\n[关键提示] 401 鉴权失败。请前往微信云开发控制台 -> 设置 -> 扩展能力 / AI 智能体，确保已开启 AI 能力并获得 hunyuan-exp 权限。";
+      }
+
+      // 生成一个模拟的错误回复，包含 <think> 标签，以便前端展示
+      rawResult = `<think>
+[系统错误] 连接中断。
+[错误详情] ${errorMsg}
+[排查建议] 
+1. 确保基础库版本 >= 3.7.1 (当前配置已尝试满足)。
+2. 确保已在 MP 后台开通“AI 小程序成长计划”。${advice}
+</think>
+抱歉，我的意识暂时无法与云端同步。请检查你的网络连接或云开发权限配置。`;
     }
+
+    // 4. 解析结果 (提取 <think> 和正文)
+    const thinkMatch = rawResult.match(/<think>([\s\S]*?)<\/think>/);
+    const thoughtContent = thinkMatch ? thinkMatch[1].trim() : "（无思维链数据）";
+    const finalContent = rawResult.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+
+    // 5. 启动前端“伪流式”打字机效果
+    this.simulateStreaming(aiMsgId, thoughtContent, finalContent);
   },
 
   // 模拟打字机效果：先打思考，再打正文
