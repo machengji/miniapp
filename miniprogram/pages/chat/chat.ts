@@ -13,6 +13,11 @@ Page({
     inputValue: '',
     scrollTarget: '',
     isStreaming: false,
+    // Dream Metadata
+    isMetadataVisible: false,
+    moodOptions: ['焦虑', '恐惧', '喜悦', '悲伤', '困惑', '平静', '愤怒', '羞耻'],
+    selectedMood: '',
+    clarity: 3,
   },
 
   onLoad() {
@@ -24,6 +29,17 @@ Page({
       isThoughtExpanded: false,
       isStreaming: false
     });
+  },
+
+  // Metadata Handlers
+  toggleMetadata() {
+    this.setData({ isMetadataVisible: !this.data.isMetadataVisible });
+  },
+  selectMood(e: any) {
+    this.setData({ selectedMood: e.currentTarget.dataset.mood });
+  },
+  onClarityChange(e: any) {
+    this.setData({ clarity: e.detail.value });
   },
 
   onInput(e: any) {
@@ -61,13 +77,18 @@ Page({
     const content = this.data.inputValue.trim();
     if (!content || this.data.isStreaming) return;
 
+    // Capture metadata at the moment of sending
+    const currentMood = this.data.selectedMood;
+    const currentClarity = this.data.clarity;
+
     // 1. 用户消息上屏
     this.addMessage({
       id: `msg_${Date.now()}_u`,
       role: 'user',
       content: content
     });
-    this.setData({ inputValue: '', isStreaming: true });
+    // Hide panel if open
+    this.setData({ inputValue: '', isStreaming: true, isMetadataVisible: false });
 
     // 2. AI 占位符
     const aiMsgId = `msg_${Date.now()}_a`;
@@ -79,6 +100,8 @@ Page({
       isThoughtExpanded: true,
       isStreaming: true
     });
+
+    let fullAnalysisText = ""; // Store full text for saving
 
     try {
       if (!wx.cloud.extend || !wx.cloud.extend.AI) {
@@ -118,6 +141,7 @@ Page({
 
       for await (let chunk of res.textStream) {
          fullText += chunk;
+         fullAnalysisText = fullText; // Update accumulator
          
          // 实时解析 <think>
          let thought = "";
@@ -146,6 +170,25 @@ Page({
              content: content
          });
       }
+
+      // --- SAVE TO DB ---
+      // Analysis complete. Save to Cloud DB.
+      console.log("Saving dream to DB...");
+      wx.cloud.callFunction({
+        name: 'saveDream',
+        data: {
+          content: content,
+          analysis: fullAnalysisText,
+          mood: currentMood,
+          clarity: currentClarity
+        }
+      }).then((res: any) => {
+        console.log("Dream saved:", res);
+        wx.showToast({ title: '梦境已记录', icon: 'success' });
+      }).catch(err => {
+        console.error("Failed to save dream:", err);
+      });
+      // ------------------
 
     } catch (err: any) {
       console.error('AI调用失败详情：', err);

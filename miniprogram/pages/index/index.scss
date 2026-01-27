@@ -1,62 +1,139 @@
-/**index.scss**/
 page {
+  background-color: #121212;
+  color: #e0e0e0;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.scrollarea {
-  flex: 1;
-  overflow-y: hidden;
 }
 
-.userinfo {
+.journal-list {
+  height: 100vh;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-top: 100rpx; // Space for nav bar
+  margin-bottom: 60rpx;
+  
+  .title {
+    display: block;
+    font-size: 56rpx;
+    font-weight: 200;
+    margin-bottom: 10rpx;
+    letter-spacing: 2rpx;
+  }
+  
+  .subtitle {
+    font-size: 28rpx;
+    color: #666;
+  }
+}
+
+.dream-card {
+  display: flex;
+  background: #1e1e1e;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  border: 1px solid #333;
+  
+  .card-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-right: 30rpx;
+    border-right: 1px solid #333;
+    min-width: 80rpx;
+    
+    .day {
+      font-size: 40rpx;
+      font-weight: bold;
+      color: #e0e0e0;
+    }
+    
+    .month {
+      font-size: 24rpx;
+      color: #666;
+      margin-top: 4rpx;
+    }
+  }
+  
+  .card-content {
+    flex: 1;
+    padding-left: 30rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    .card-title {
+      font-size: 32rpx;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 12rpx;
+    }
+    
+    .card-meta {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12rpx;
+      
+      .mood-tag {
+        font-size: 22rpx;
+        color: #8a6dff;
+        background: rgba(138, 109, 255, 0.1);
+        padding: 4rpx 12rpx;
+        border-radius: 8rpx;
+      }
+      
+      .clarity-dots {
+        font-size: 22rpx;
+      }
+    }
+
+    .card-preview {
+      font-size: 24rpx;
+      color: #888;
+      line-height: 1.4;
+    }
+  }
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #aaa;
-  width: 80%;
+  justify-content: center;
+  padding-top: 100rpx;
+  opacity: 0.5;
+  
+  .sub-text {
+    font-size: 24rpx;
+    margin-top: 20rpx;
+    color: #666;
+  }
 }
 
-.userinfo-avatar {
-  overflow: hidden;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  width: 110rpx;
+  height: 110rpx;
+  background: #8a6dff;
   border-radius: 50%;
-}
-
-.usermotto {
-  margin-top: 200px;
-}
-
-.avatar-wrapper {
-  padding: 0;
-  width: 56px !important;
-  border-radius: 8px;
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
-
-.avatar {
-  display: block;
-  width: 56px;
-  height: 56px;
-}
-
-.nickname-wrapper {
   display: flex;
-  width: 100%;
-  padding: 16px;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 60rpx;
+  font-weight: 200;
+  box-shadow: 0 10rpx 30rpx rgba(138, 109, 255, 0.4);
+  z-index: 100;
+  padding-bottom: 10rpx; // Visual adjustment for "+"
   box-sizing: border-box;
-  border-top: .5px solid rgba(0, 0, 0, 0.1);
-  border-bottom: .5px solid rgba(0, 0, 0, 0.1);
-  color: black;
-}
-
-.nickname-label {
-  width: 105px;
-}
-
-.nickname-input {
-  flex: 1;
+  transition: transform 0.2s;
+  
+  &:active {
+    transform: scale(0.9);
+  }
 }

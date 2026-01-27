@@ -1,28 +1,35 @@
 <!--index.wxml-->
-<navigation-bar title="Weixin" back="{{false}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
+<navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212"></navigation-bar>
+<scroll-view class="journal-list" scroll-y type="list">
+  <view class="header">
+    <text class="title">梦境日志</text>
+    <text class="subtitle">记录无意识的低语</text>
+  </view>
+
+  <view class="dream-card" wx:for="{{dreams}}" wx:key="_id">
+    <view class="card-date">
+      <text class="day">{{item.day}}</text>
+      <text class="month">{{item.month}}</text>
     </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+    <view class="card-content">
+      <text class="card-title">{{item.summary || '无题梦境'}}</text>
+      <view class="card-meta">
+        <text class="mood-tag" wx:if="{{item.mood && item.mood !== 'unknown'}}">#{{item.mood}}</text>
+        <text class="clarity-dots" style="color: #666; margin-left: 10rpx;">清晰度 {{item.clarity}}/5</text>
+      </view>
+      <text class="card-preview">{{item.content}}</text>
     </view>
   </view>
+  
+  <view class="empty-state" wx:if="{{dreams.length === 0}}">
+    <text>尚未记录任何梦境</text>
+    <text class="sub-text">点击右下角按钮，开启你的潜意识探索之旅。</text>
+  </view>
+  
+  <!-- Spacing for FAB -->
+  <view style="height: 120rpx;"></view>
 </scroll-view>
+
+<view class="fab" bindtap="goToChat">
+  <text>+</text>
+</view>

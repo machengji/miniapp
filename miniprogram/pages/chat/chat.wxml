@@ -46,7 +46,41 @@
   <view id="bottom-anchor" style="height: 20rpx;"></view>
 </scroll-view>
 
+<!-- Dream Metadata Panel -->
+<view class="metadata-panel {{isMetadataVisible ? 'visible' : ''}}">
+  <view class="panel-header">
+    <text>梦境标记</text>
+    <view class="close-btn" bindtap="toggleMetadata">×</view>
+  </view>
+  
+  <view class="section-title">情绪基调</view>
+  <scroll-view class="tags-scroll" scroll-x="true" enable-flex="true">
+    <view 
+      class="tag {{selectedMood === item ? 'selected' : ''}}" 
+      wx:for="{{moodOptions}}" 
+      wx:key="*this"
+      bindtap="selectMood"
+      data-mood="{{item}}"
+    >
+      {{item}}
+    </view>
+  </scroll-view>
+
+  <view class="section-title">清晰度 ({{clarity}}/5)</view>
+  <slider 
+    min="1" max="5" 
+    value="{{clarity}}" 
+    activeColor="#6e00ff" 
+    backgroundColor="#333" 
+    block-size="16"
+    bindchange="onClarityChange"
+  />
+</view>
+
 <view class="input-area">
+  <view class="meta-toggle-btn {{isMetadataVisible ? 'active' : ''}}" bindtap="toggleMetadata">
+    ⚙
+  </view>
   <input 
     class="chat-input" 
     type="text" 

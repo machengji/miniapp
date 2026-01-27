@@ -1,0 +1,11 @@
+{
+  "name": "saveDream",
+  "version": "1.0.0",
+  "description": "Save dream to database and generate summary",
+  "main": "index.js",
+  "author": "Aletheia",
+  "license": "MIT",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

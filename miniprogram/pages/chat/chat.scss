@@ -210,6 +210,92 @@ page {
   }
 }
 
+.meta-toggle-btn {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #666;
+  margin-right: 16rpx;
+  border-radius: 50%;
+  transition: all 0.2s;
+
+  &.active {
+    color: #8a6dff;
+    background: rgba(138, 109, 255, 0.1);
+  }
+}
+
+.metadata-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -500rpx; // 改为固定的负值，完全在屏幕外
+  background: #222;
+  border-top-left-radius: 30rpx;
+  border-top-right-radius: 30rpx;
+  padding: 30rpx;
+  transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  border-top: 1px solid #333;
+  box-shadow: 0 -10rpx 40rpx rgba(0,0,0,0.5);
+
+  &.visible {
+    bottom: calc(120rpx + env(safe-area-inset-bottom));
+  }
+  
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30rpx;
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #e0e0e0;
+
+    .close-btn {
+      padding: 10rpx 20rpx;
+      color: #888;
+      font-size: 40rpx;
+      line-height: 1;
+    }
+  }
+
+  .section-title {
+    font-size: 24rpx;
+    color: #888;
+    margin-bottom: 20rpx;
+    margin-top: 10rpx;
+  }
+
+  .tags-scroll {
+    display: flex;
+    white-space: nowrap;
+    height: 70rpx;
+    margin-bottom: 30rpx;
+    
+    .tag {
+      display: inline-block;
+      padding: 10rpx 24rpx;
+      background: #333;
+      color: #aaa;
+      border-radius: 30rpx;
+      font-size: 26rpx;
+      margin-right: 20rpx;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+
+      &.selected {
+        background: rgba(138, 109, 255, 0.2);
+        color: #8a6dff;
+        border-color: #8a6dff;
+      }
+    }
+  }
+}
+
 @keyframes pulse {
   0% { opacity: 0.5; }
   50% { opacity: 1; text-shadow: 0 0 10rpx rgba(138, 109, 255, 0.5); }
