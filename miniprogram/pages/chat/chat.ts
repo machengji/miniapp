@@ -69,78 +69,95 @@ Page({
     });
     this.setData({ inputValue: '', isStreaming: true });
 
-    // 2. AI 占位符 (显示"分析中...")
+    // 2. AI 占位符
     const aiMsgId = `msg_${Date.now()}_a`;
     this.addMessage({
       id: aiMsgId,
       role: 'assistant',
-      content: '', // 暂时为空，等待打字机效果
-      thought: '正在连接潜意识网络 (Cloud AI)...', 
+      content: '', 
+      thought: '', 
       isThoughtExpanded: true,
       isStreaming: true
     });
 
-    let rawResult = "";
-
     try {
-      // 3. 直接调用微信云开发 AI 能力 (需要基础库 3.7.1+)
       if (!wx.cloud.extend || !wx.cloud.extend.AI) {
         throw new Error('基础库版本过低，请在开发者工具详情-本地设置中切换到 3.7.1 以上版本');
       }
 
       const ai = wx.cloud.extend.AI;
-      const model = ai.createModel('deepseek');
+      const model = ai.createModel('hunyuan-exp');
 
-      const res = await model.generateText({
-        model: 'deepseek-r1-0528',
-        messages: [
-          { role: 'system', content: `
+      // 严格构造消息队列
+      let history = this.data.messages
+        .filter(m => m.content && m.content.trim().length > 0)
+        .map(m => ({ role: m.role, content: m.content }));
+
+      if (history.length > 0 && history[0].role === 'assistant') {
+        history.shift();
+      }
+
+      const finalMessages = [
+        { role: 'system', content: `
 你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
 在回复用户之前，你必须先进行推理，并将推理过程用 <think> 和 </think> 标签包裹起来放在最前面。
 ` },
-          ...this.data.messages
-            .filter(m => m.role === 'user' || (m.role === 'assistant' && m.content)) // 严格过滤
-            .map(m => ({ role: m.role, content: m.content }))
-        ]
+        ...history
+      ];
+
+      console.log('Sending Messages to AI (Stream):', finalMessages);
+
+      const res = await model.streamText({
+        data: {
+          model: 'hunyuan-turbos-latest',
+          messages: finalMessages
+        }
       });
       
-      console.log('AI Response:', res); // 调试日志
+      let fullText = "";
 
-      if (res.choices && res.choices.length > 0) {
-          rawResult = res.choices[0].message.content || "";
-      } else {
-          console.warn('AI 返回结构异常:', res);
-          throw new Error('AI 返回了空内容');
+      for await (let chunk of res.textStream) {
+         fullText += chunk;
+         
+         // 实时解析 <think>
+         let thought = "";
+         let content = "";
+         
+         const thinkStart = fullText.indexOf('<think>');
+         const thinkEnd = fullText.indexOf('</think>');
+         
+         if (thinkStart !== -1) {
+             if (thinkEnd !== -1) {
+                 // 思考结束
+                 thought = fullText.substring(thinkStart + 7, thinkEnd);
+                 content = fullText.substring(thinkEnd + 8);
+             } else {
+                 // 正在思考
+                 thought = fullText.substring(thinkStart + 7);
+                 content = ""; 
+             }
+         } else {
+             // 没发现 think 标签，暂时当做正文
+             content = fullText;
+         }
+
+         this.updateLastMessage({
+             thought: thought,
+             content: content
+         });
       }
 
     } catch (err: any) {
       console.error('AI调用失败详情：', err);
-      
       let errorMsg = err.message || JSON.stringify(err);
-      let advice = "";
-      
-      if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
-          advice = "\n[关键提示] 401 鉴权失败。请前往微信云开发控制台 -> 设置 -> 扩展能力 / AI 智能体，确保已开启 AI 能力并获得 hunyuan-exp 权限。";
-      }
-
-      // 生成一个模拟的错误回复，包含 <think> 标签，以便前端展示
-      rawResult = `<think>
-[系统错误] 连接中断。
-[错误详情] ${errorMsg}
-[排查建议] 
-1. 确保基础库版本 >= 3.7.1 (当前配置已尝试满足)。
-2. 确保已在 MP 后台开通“AI 小程序成长计划”。${advice}
-</think>
-抱歉，我的意识暂时无法与云端同步。请检查你的网络连接或云开发权限配置。`;
+      this.updateLastMessage({
+          thought: `[系统错误]\n${errorMsg}`,
+          content: "连接中断，请检查网络或配置。"
+      });
+    } finally {
+        this.setData({ isStreaming: false, scrollTarget: 'bottom-anchor' });
+        this.updateLastMessage({ isStreaming: false });
     }
-
-    // 4. 解析结果 (提取 <think> 和正文)
-    const thinkMatch = rawResult.match(/<think>([\s\S]*?)<\/think>/);
-    const thoughtContent = thinkMatch ? thinkMatch[1].trim() : "（无思维链数据）";
-    const finalContent = rawResult.replace(/<think>[\s\S]*?<\/think>/, '').trim();
-
-    // 5. 启动前端“伪流式”打字机效果
-    this.simulateStreaming(aiMsgId, thoughtContent, finalContent);
   },
 
   // 模拟打字机效果：先打思考，再打正文
