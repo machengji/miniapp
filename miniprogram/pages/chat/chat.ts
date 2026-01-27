@@ -120,10 +120,37 @@ Page({
         history.shift();
       }
 
+      // --- Memory Injection Start ---
+      let memoryContext = "";
+      try {
+        const db = wx.cloud.database();
+        const res = await db.collection('dreams')
+          .orderBy('createTime', 'desc')
+          .limit(5)
+          .get();
+        
+        const pastDreams = res.data;
+        if (pastDreams.length > 0) {
+          memoryContext = "\n\n【长期记忆档案 (Long-term Memory)】\n该用户之前的梦境记录如下（按时间倒序）：\n";
+          pastDreams.forEach((d: any, i: number) => {
+            // Format: 1. [Mood] Summary - Content snippet...
+            const dateStr = d.createTime ? new Date(d.createTime).toLocaleDateString() : '未知日期';
+            const snippet = d.content.length > 40 ? d.content.substring(0, 40) + "..." : d.content;
+            memoryContext += `${i + 1}. [${dateStr}] [${d.mood || 'N/A'}] ${d.summary || '无题'}：${snippet}\n`;
+          });
+          memoryContext += "\n【对比分析指令】\n请务必将本次梦境与上述【长期记忆档案】进行横向对比。\n1. 寻找重复出现的意象（Recurrent Symbols）：是否有旧的意象再次出现？形态有何变化？\n2. 识别情绪曲线：用户的情绪是恶化了还是改善了？\n3. 在回复中显式地指出这些联系（例如：“这让你想起了上周那个关于...的梦...”）。";
+        }
+      } catch (err) {
+        console.error("Failed to load memory context:", err);
+        // Fail silently, proceed without memory
+      }
+      // --- Memory Injection End ---
+
       const finalMessages = [
         { role: 'system', content: `
 你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
 在回复用户之前，你必须先进行推理，并将推理过程用 <think> 和 </think> 标签包裹起来放在最前面。
+${memoryContext}
 ` },
         ...history
       ];

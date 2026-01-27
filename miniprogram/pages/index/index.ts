@@ -38,5 +38,11 @@ Page({
     wx.navigateTo({
       url: '../chat/chat'
     })
+  },
+
+  goToReport() {
+    wx.navigateTo({
+      url: '../report/report'
+    })
   }
 })

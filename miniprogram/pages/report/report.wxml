@@ -1,0 +1,57 @@
+<navigation-bar title="Soul Map" back="{{true}}" color="white" background="#121212"></navigation-bar>
+
+<scroll-view class="report-container" scroll-y>
+  
+  <view class="header">
+    <text class="title">心灵映射</text>
+    <text class="subtitle">潜意识能量分布图</text>
+  </view>
+
+  <!-- 1. 荣格十二原型雷达图 -->
+  <view class="chart-card">
+    <view class="card-header">
+      <text class="card-title">原型曼陀罗 (Archetypes)</text>
+      <text class="card-desc">基于近期梦境意象分析</text>
+    </view>
+    <canvas type="2d" id="radarCanvas" class="radar-canvas"></canvas>
+  </view>
+
+  <!-- 2. 阴影 vs 面具 -->
+  <view class="chart-card">
+    <view class="card-header">
+      <text class="card-title">能量极性</text>
+    </view>
+    <view class="polarity-bar-container">
+      <view class="polarity-labels">
+        <text class="label-persona">Persona (面具)</text>
+        <text class="label-shadow">Shadow (阴影)</text>
+      </view>
+      <view class="progress-bg">
+        <view class="progress-fill" style="width: {{personaPercentage}}%;"></view>
+        <view class="marker" style="left: {{personaPercentage}}%;"></view>
+      </view>
+      <text class="insight-text">{{polarityInsight}}</text>
+    </view>
+  </view>
+
+  <!-- 3. 情绪统计 -->
+  <view class="stat-grid">
+    <view class="stat-item">
+      <text class="stat-val">{{totalDreams}}</text>
+      <text class="stat-label">记录梦境</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-val">{{avgClarity}}</text>
+      <text class="stat-label">平均清晰度</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-val highlight">{{dominantMood}}</text>
+      <text class="stat-label">主导情绪</text>
+    </view>
+  </view>
+
+  <view class="footer-quote">
+    “往外张望的人在做梦，向内审视的人才是清醒的。” —— C.G. Jung
+  </view>
+
+</scroll-view>

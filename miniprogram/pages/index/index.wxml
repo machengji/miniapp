@@ -2,8 +2,15 @@
 <navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212"></navigation-bar>
 <scroll-view class="journal-list" scroll-y type="list">
   <view class="header">
-    <text class="title">梦境日志</text>
-    <text class="subtitle">记录无意识的低语</text>
+    <view class="header-top" style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <view>
+        <text class="title">梦境日志</text>
+        <text class="subtitle">记录无意识的低语</text>
+      </view>
+      <view class="map-btn" bindtap="goToReport" style="background: #2a2a2a; padding: 16rpx; border-radius: 50%; width: 80rpx; height: 80rpx; display: flex; align-items: center; justify-content: center; border: 1px solid #333;">
+        <text style="font-size: 40rpx;">🔮</text>
+      </view>
+    </view>
   </view>
 
   <view class="dream-card" wx:for="{{dreams}}" wx:key="_id">

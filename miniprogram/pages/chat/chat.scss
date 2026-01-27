@@ -64,6 +64,8 @@ page {
   margin-bottom: 40rpx;
   display: flex;
   width: 100%;
+  padding: 0 10rpx; // Slight side padding
+  box-sizing: border-box;
   
   &.user {
     justify-content: flex-end;
@@ -75,18 +77,20 @@ page {
 }
 
 .avatar {
-  width: 60rpx;
-  height: 60rpx;
+  width: 70rpx; // Slightly larger
+  height: 70rpx;
   background: #2a2a2a;
+  border: 1px solid #333;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #888;
-  margin-right: 20rpx;
+  margin-right: 24rpx;
   flex-shrink: 0;
-  margin-top: 10rpx;
+  margin-top: 0; // Align top
+  font-family: 'Times New Roman', serif;
 }
 
 .content-wrapper {
@@ -97,16 +101,18 @@ page {
 
 .bubble {
   padding: 24rpx 32rpx;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   font-size: 30rpx;
   line-height: 1.6;
   position: relative;
   word-break: break-all;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
   
   &.user-bubble {
-    background-color: #333;
+    background: linear-gradient(135deg, #4a4a4a, #2a2a2a); // Subtle Gradient
     color: #fff;
-    border-top-right-radius: 4rpx;
+    border-top-right-radius: 4rpx; // Visual cue
+    border: 1px solid rgba(255,255,255,0.05);
   }
   
   &.ai-bubble {
@@ -114,29 +120,35 @@ page {
     color: #d1d1d1;
     padding-left: 0;
     margin-top: 10rpx;
+    font-weight: 300; // Lighter weight for reading
   }
 }
 
-// 核心：思维链样式
+// 核心：思维链样式 - 增强版
 .thought-chain {
-  background: #1e1e1e;
+  background: #181818;
   border-radius: 12rpx;
-  border: 1px solid #333;
-  margin-bottom: 10rpx;
+  border: 1px solid #2a2a2a;
+  border-left: 3px solid #8a6dff; // Accent border
+  margin-bottom: 16rpx;
   overflow: hidden;
   width: 100%;
+  box-shadow: inset 0 0 20rpx rgba(0,0,0,0.5);
   
   .thought-header {
     display: flex;
     align-items: center;
-    padding: 16rpx 20rpx;
-    font-size: 24rpx;
+    padding: 12rpx 20rpx;
+    font-size: 22rpx;
     color: #666;
-    background: #252525;
+    background: #222;
+    text-transform: uppercase;
+    letter-spacing: 1rpx;
     
     .icon-brain {
       margin-right: 12rpx;
-      color: #8a6dff; // 神秘紫
+      color: #8a6dff; 
+      font-size: 24rpx;
       animation: pulse 3s infinite;
     }
     
@@ -150,13 +162,13 @@ page {
   }
   
   .thought-content {
-    padding: 20rpx;
+    padding: 24rpx;
     font-size: 24rpx;
     color: #888;
-    font-family: monospace;
-    border-top: 1px solid #333;
-    background: #1a1a1a;
-    line-height: 1.5;
+    font-family: 'Courier New', monospace; // Monospace for 'code/thought' feel
+    background: #151515;
+    line-height: 1.6;
+    white-space: pre-wrap;
   }
 }
 
@@ -171,9 +183,10 @@ page {
 }
 
 .input-area {
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #1a1a1a;
+  padding: 24rpx 30rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   border-top: 1px solid #333;
@@ -182,10 +195,16 @@ page {
     flex: 1;
     background: #2a2a2a;
     color: #fff;
-    padding: 20rpx 30rpx;
+    padding: 22rpx 34rpx;
     border-radius: 40rpx;
     margin-right: 20rpx;
     font-size: 30rpx;
+    border: 1px solid transparent;
+    transition: border 0.2s;
+    
+    &:focus {
+      border-color: #555;
+    }
   }
   
   .input-placeholder {
@@ -193,19 +212,25 @@ page {
   }
   
   .send-btn {
-    width: 80rpx;
-    height: 80rpx;
+    width: 88rpx;
+    height: 88rpx;
     background: #333;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #666;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
     &.active {
       background: #8a6dff;
       color: #fff;
+      box-shadow: 0 4rpx 12rpx rgba(138, 109, 255, 0.4);
+      transform: scale(1.05);
+    }
+    
+    &:active {
+      transform: scale(0.95);
     }
   }
 }
@@ -216,9 +241,9 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
+  font-size: 44rpx;
   color: #666;
-  margin-right: 16rpx;
+  margin-right: 12rpx;
   border-radius: 50%;
   transition: all 0.2s;
 
@@ -232,18 +257,20 @@ page {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: -500rpx; // 改为固定的负值，完全在屏幕外
-  background: #222;
-  border-top-left-radius: 30rpx;
-  border-top-right-radius: 30rpx;
-  padding: 30rpx;
-  transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 100;
-  border-top: 1px solid #333;
-  box-shadow: 0 -10rpx 40rpx rgba(0,0,0,0.5);
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
+  background: rgba(34, 34, 34, 0.95);
+  backdrop-filter: blur(20px);
+  border-top-left-radius: 36rpx;
+  border-top-right-radius: 36rpx;
+  padding: 40rpx;
+  transform: translateY(120%);
+  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); // Exponential ease
+  z-index: 90;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 -20rpx 60rpx rgba(0,0,0,0.6);
 
   &.visible {
-    bottom: calc(120rpx + env(safe-area-inset-bottom));
+    transform: translateY(0);
   }
   
   .panel-header {
