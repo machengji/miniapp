@@ -1,57 +1,114 @@
-<navigation-bar title="Soul Map" back="{{true}}" color="white" background="#121212"></navigation-bar>
+<navigation-bar title="心灵报告" back="{{true}}" color="white" background="#121212"></navigation-bar>
 
 <scroll-view class="report-container" scroll-y>
-  
-  <view class="header">
-    <text class="title">心灵映射</text>
-    <text class="subtitle">潜意识能量分布图</text>
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在分析你的潜意识...</text>
   </view>
 
-  <!-- 1. 荣格十二原型雷达图 -->
-  <view class="chart-card">
-    <view class="card-header">
-      <text class="card-title">原型曼陀罗 (Archetypes)</text>
-      <text class="card-desc">基于近期梦境意象分析</text>
-    </view>
-    <canvas type="2d" id="radarCanvas" class="radar-canvas"></canvas>
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!isLoading && totalDreams === 0}}">
+    <view class="empty-icon">📊</view>
+    <text class="empty-title">还没有足够的数据</text>
+    <text class="empty-subtitle">记录至少3个梦境后，就能生成你的心灵报告了</text>
+    <view class="start-btn" bindtap="goToChat">开始记录</view>
   </view>
 
-  <!-- 2. 阴影 vs 面具 -->
-  <view class="chart-card">
-    <view class="card-header">
-      <text class="card-title">能量极性</text>
-    </view>
-    <view class="polarity-bar-container">
-      <view class="polarity-labels">
-        <text class="label-persona">Persona (面具)</text>
-        <text class="label-shadow">Shadow (阴影)</text>
+  <!-- 报告内容 -->
+  <block wx:if="{{!isLoading && totalDreams > 0}}">
+    <!-- 头部统计 -->
+    <view class="header-section">
+      <view class="stat-cards">
+        <view class="stat-card">
+          <text class="stat-number">{{totalDreams}}</text>
+          <text class="stat-label">记录梦境</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-number">{{avgClarity}}</text>
+          <text class="stat-label">平均清晰度</text>
+        </view>
+        <view class="stat-card">
+          <text class="stat-number">{{dominantMood}}</text>
+          <text class="stat-label">主导情绪</text>
+        </view>
       </view>
-      <view class="progress-bg">
-        <view class="progress-fill" style="width: {{personaPercentage}}%;"></view>
-        <view class="marker" style="left: {{personaPercentage}}%;"></view>
+    </view>
+
+    <!-- Persona / Shadow -->
+    <view class="section">
+      <view class="section-title">人格面具与阴影</view>
+      <view class="polarity-bar">
+        <view class="polarity-label left">
+          <text class="label-title">Persona 面具</text>
+          <text class="label-desc">意识层面</text>
+        </view>
+        <view class="bar-container">
+          <view class="bar-bg">
+            <view class="bar-fill" style="width: {{personaPercentage}}%"></view>
+          </view>
+          <view class="balance-indicator" style="left: {{personaPercentage}}%">
+            <view class="indicator-dot"></view>
+          </view>
+        </view>
+        <view class="polarity-label right">
+          <text class="label-title">Shadow 阴影</text>
+          <text class="label-desc">潜意识层面</text>
+        </view>
       </view>
-      <text class="insight-text">{{polarityInsight}}</text>
+      <view class="insight-box">
+        <text class="insight-text">{{polarityInsight}}</text>
+      </view>
     </view>
-  </view>
 
-  <!-- 3. 情绪统计 -->
-  <view class="stat-grid">
-    <view class="stat-item">
-      <text class="stat-val">{{totalDreams}}</text>
-      <text class="stat-label">记录梦境</text>
+    <!-- 原型雷达图 -->
+    <view class="section">
+      <view class="section-title">原型能量分布</view>
+      <view class="section-subtitle">基于荣格12原型理论</view>
+      <view class="radar-container">
+        <canvas type="2d" id="radarCanvas" class="radar-canvas"></canvas>
+      </view>
+      <view class="archetype-legend">
+        <view class="legend-item" wx:for="{{archetypes}}" wx:key="name">
+          <text class="legend-icon">{{item.icon}}</text>
+          <text class="legend-name">{{item.name}}</text>
+          <text class="legend-value">{{item.value}}</text>
+        </view>
+      </view>
     </view>
-    <view class="stat-item">
-      <text class="stat-val">{{avgClarity}}</text>
-      <text class="stat-label">平均清晰度</text>
-    </view>
-    <view class="stat-item">
-      <text class="stat-val highlight">{{dominantMood}}</text>
-      <text class="stat-label">主导情绪</text>
-    </view>
-  </view>
 
-  <view class="footer-quote">
-    “往外张望的人在做梦，向内审视的人才是清醒的。” —— C.G. Jung
-  </view>
+    <!-- 情绪分布 -->
+    <view class="section" wx:if="{{moodDistribution.length > 0}}">
+      <view class="section-title">情绪分布</view>
+      <view class="mood-bars">
+        <view class="mood-bar-item" wx:for="{{moodDistribution}}" wx:key="mood">
+          <text class="mood-name">{{item.mood}}</text>
+          <view class="bar-wrapper">
+            <view class="bar" style="width: {{item.percentage}}%"></view>
+          </view>
+          <text class="mood-count">{{item.count}}次 ({{item.percentage}}%)</text>
+        </view>
+      </view>
+    </view>
 
+    <!-- 反复出现的意象 -->
+    <view class="section" wx:if="{{recurrentSymbols.length > 0}}">
+      <view class="section-title">反复出现的意象</view>
+      <view class="section-subtitle">这些可能是你潜意识的核心符号</view>
+      <view class="symbols-cloud">
+        <view class="symbol-tag" wx:for="{{recurrentSymbols}}" wx:key="*this">
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部间距 -->
+    <view style="height: 60rpx;"></view>
+  </block>
 </scroll-view>
+
+<!-- 分享按钮 -->
+<view class="share-btn" bindtap="shareReport" wx:if="{{totalDreams > 0}}">
+  <text class="share-icon">↗</text>
+  <text class="share-text">分享报告</text>
+</view>

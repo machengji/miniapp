@@ -1,120 +1,222 @@
+import { memoryService } from '../../services/memory.service';
+
 Page({
   data: {
+    // Persona/Shadow 平衡
     personaPercentage: 50,
-    polarityInsight: "你的意识与潜意识目前处于平衡状态。",
+    polarityInsight: "你的心灵处于动态平衡中。",
+    
+    // 基础统计
     totalDreams: 0,
     avgClarity: "0.0",
     dominantMood: "-",
+    streakDays: 0,
+    
     // 荣格 12 原型 (用于雷达图)
     archetypes: [
-      { name: '天真者', value: 0 }, { name: '孤儿', value: 0 }, 
-      { name: '英雄', value: 0 }, { name: '照顾者', value: 0 },
-      { name: '探索者', value: 0 }, { name: '反叛者', value: 0 },
-      { name: '情人', value: 0 }, { name: '创造者', value: 0 },
-      { name: '小丑', value: 0 }, { name: '智者', value: 0 },
-      { name: '魔术师', value: 0 }, { name: '统治者', value: 0 }
-    ]
+      { name: '天真者', value: 0, icon: '👶' },
+      { name: '孤儿', value: 0, icon: '🏃' },
+      { name: '英雄', value: 0, icon: '⚔️' },
+      { name: '照顾者', value: 0, icon: '🤱' },
+      { name: '探索者', value: 0, icon: '🔍' },
+      { name: '反叛者', value: 0, icon: '🔥' },
+      { name: '情人', value: 0, icon: '❤️' },
+      { name: '创造者', value: 0, icon: '🎨' },
+      { name: '小丑', value: 0, icon: '🃏' },
+      { name: '智者', value: 0, icon: '📚' },
+      { name: '魔术师', value: 0, icon: '🔮' },
+      { name: '统治者', value: 0, icon: '👑' }
+    ],
+    
+    // 情绪分布
+    moodDistribution: [] as {mood: string, count: number, percentage: number}[],
+    
+    // 反复出现的意象
+    recurrentSymbols: [] as string[],
+    
+    // 加载状态
+    isLoading: true
   },
 
   onShow() {
-    this.calculateStats();
+    this.loadReportData();
   },
 
-  calculateStats() {
-    const db = wx.cloud.database();
-    db.collection('dreams').get().then(res => {
-      const dreams = res.data;
-      if (dreams.length === 0) return;
+  /**
+   * 加载报告数据
+   */
+  async loadReportData() {
+    this.setData({ isLoading: true });
+    
+    try {
+      // 并行加载数据
+      const [dreamsRes, memoryRes] = await Promise.all([
+        this.loadDreams(),
+        memoryService.loadMemoryContext()
+      ]);
+      
+      const dreams = dreamsRes;
+      
+      if (dreams.length === 0) {
+        this.setData({ isLoading: false });
+        return;
+      }
 
       // 1. 基础统计
       const total = dreams.length;
       const totalClarity = dreams.reduce((acc: number, cur: any) => acc + (cur.clarity || 0), 0);
       const avgClarity = (totalClarity / total).toFixed(1);
 
-      // 2. 情绪分析 & 简单的原型映射 (Mock Logic for MVP)
-      // 真实场景应该由 AI 在分析时打标。这里我们用 mood 做一个简单映射。
-      const moodCounts: any = {};
-      let archetypeScores = [...this.data.archetypes];
-      
-      // 映射规则：Mood -> Archetype Bonus
-      const mapping: any = {
-        '焦虑': [1, 5], // 孤儿, 反叛者
-        '恐惧': [1],    // 孤儿
-        '喜悦': [0, 6], // 天真者, 情人
-        '愤怒': [2, 5], // 英雄, 反叛者
-        '平静': [9],    // 智者
-        '困惑': [4],    // 探索者
-        '悲伤': [3],    // 照顾者 (自我照顾)
-        '羞耻': [11]    // 统治者 (失控)
-      };
+      // 2. 计算原型得分（结合云端存储的 archetypeScores）
+      const archetypeScores = this.calculateArchetypeScores(dreams);
 
-      dreams.forEach((d: any) => {
-        // Mood Stat
-        const m = d.mood || 'unknown';
-        moodCounts[m] = (moodCounts[m] || 0) + 1;
+      // 3. 情绪分布
+      const moodDistribution = this.calculateMoodDistribution(dreams);
+      const dominantMood = moodDistribution.length > 0 ? moodDistribution[0].mood : '-';
 
-        // Archetype Score Accumulation
-        if (mapping[m]) {
-          mapping[m].forEach((idx: number) => {
-            archetypeScores[idx].value += 1;
-          });
-        }
-      });
+      // 4. Persona/Shadow 计算
+      const { personaPercentage, insight } = this.calculatePersonaShadow(dreams);
 
-      // Normalize scores (0-100) for radar
-      const maxScore = Math.max(...archetypeScores.map(a => a.value)) || 1;
-      archetypeScores = archetypeScores.map(a => ({
-        ...a,
-        value: (a.value / maxScore) * 80 + 20 // 基础分20，防止图形太小
-      }));
-
-      // Dominant Mood
-      let domMood = '-';
-      let maxCount = 0;
-      for (let m in moodCounts) {
-        if (moodCounts[m] > maxCount) {
-          maxCount = moodCounts[m];
-          domMood = m;
-        }
-      }
-
-      // Persona/Shadow Calculation
-      // 假设：负面情绪越多，Shadow 越活跃；正面情绪多，Persona 越稳固
-      // 这只是一个简单的算法演示
-      const negativeMoods = ['恐惧', '焦虑', '愤怒', '羞耻', '悲伤'];
-      let negCount = 0;
-      dreams.forEach((d: any) => {
-        if (negativeMoods.includes(d.mood)) negCount++;
-      });
-      const shadowRatio = negCount / total;
-      // Persona % = 100 - (ShadowRatio * 100). If shadow is 0.8 (80%), Persona is 20%.
-      // We want the bar to show Persona vs Shadow. Let's say Left is Persona (100%), Right is Shadow (0%)?
-      // No, typical slider. Let's say value is Persona %.
-      const personaPct = Math.floor((1 - shadowRatio * 0.8) * 100); 
-
-      let insight = "你的心灵处于动态平衡中。";
-      if (personaPct > 80) insight = "你的防御机制（面具）很强，可能压抑了部分真实感受。";
-      if (personaPct < 40) insight = "阴影原型正在浮现，这虽令人不安，却是转化的契机。";
+      // 5. 反复出现的意象
+      const recurrentSymbols = memoryRes.recurrentSymbols.slice(0, 6);
 
       this.setData({
         totalDreams: total,
         avgClarity: avgClarity,
-        dominantMood: domMood,
+        dominantMood: dominantMood,
         archetypes: archetypeScores,
-        personaPercentage: personaPct,
-        polarityInsight: insight
+        personaPercentage: personaPercentage,
+        polarityInsight: insight,
+        moodDistribution: moodDistribution,
+        recurrentSymbols: recurrentSymbols,
+        isLoading: false
       });
 
       // 渲染 Canvas
       this.drawRadar(archetypeScores);
+      
+    } catch (err) {
+      console.error('加载报告失败:', err);
+      this.setData({ isLoading: false });
+    }
+  },
+
+  /**
+   * 加载梦境列表
+   */
+  loadDreams(): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const db = wx.cloud.database();
+      db.collection('dreams')
+        .orderBy('createTime', 'desc')
+        .get()
+        .then(res => resolve(res.data))
+        .catch(reject);
     });
   },
 
+  /**
+   * 计算原型得分
+   */
+  calculateArchetypeScores(dreams: any[]) {
+    // 初始分数
+    const scores = [
+      { name: '天真者', value: 20, icon: '👶', key: 'innocent' },
+      { name: '孤儿', value: 20, icon: '🏃', key: 'orphan' },
+      { name: '英雄', value: 20, icon: '⚔️', key: 'hero' },
+      { name: '照顾者', value: 20, icon: '🤱', key: 'caregiver' },
+      { name: '探索者', value: 20, icon: '🔍', key: 'explorer' },
+      { name: '反叛者', value: 20, icon: '🔥', key: 'rebel' },
+      { name: '情人', value: 20, icon: '❤️', key: 'lover' },
+      { name: '创造者', value: 20, icon: '🎨', key: 'creator' },
+      { name: '小丑', value: 20, icon: '🃏', key: 'jester' },
+      { name: '智者', value: 20, icon: '📚', key: 'sage' },
+      { name: '魔术师', value: 20, icon: '🔮', key: 'magician' },
+      { name: '统治者', value: 20, icon: '👑', key: 'ruler' }
+    ];
+
+    // 累加每条梦境的原型得分
+    dreams.forEach(dream => {
+      if (dream.archetypeScores) {
+        scores.forEach((score, idx) => {
+          if (dream.archetypeScores[score.key]) {
+            scores[idx].value += dream.archetypeScores[score.key] - 20; // 减去基础分
+          }
+        });
+      }
+    });
+
+    // 归一化到 0-100
+    const maxScore = Math.max(...scores.map(s => s.value)) || 1;
+    const minScore = Math.min(...scores.map(s => s.value)) || 0;
+    const range = maxScore - minScore || 1;
+    
+    return scores.map(s => ({
+      ...s,
+      value: Math.round(((s.value - minScore) / range) * 80 + 10) // 10-90的范围
+    }));
+  },
+
+  /**
+   * 计算情绪分布
+   */
+  calculateMoodDistribution(dreams: any[]) {
+    const moodCounts: Record<string, number> = {};
+    
+    dreams.forEach(dream => {
+      const mood = dream.mood || '未知';
+      moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+    });
+
+    const total = dreams.length;
+    const distribution = Object.entries(moodCounts)
+      .map(([mood, count]) => ({
+        mood,
+        count,
+        percentage: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5); // 只显示前5种情绪
+
+    return distribution;
+  },
+
+  /**
+   * 计算 Persona/Shadow 比例
+   */
+  calculatePersonaShadow(dreams: any[]) {
+    const negativeMoods = ['恐惧', '焦虑', '愤怒', '羞耻', '悲伤'];
+    let negCount = 0;
+    
+    dreams.forEach(dream => {
+      if (negativeMoods.includes(dream.mood)) negCount++;
+    });
+
+    const shadowRatio = negCount / dreams.length;
+    const personaPercentage = Math.floor((1 - shadowRatio * 0.8) * 100);
+
+    let insight = "你的心灵处于动态平衡中。";
+    if (personaPercentage > 80) {
+      insight = "你的防御机制（面具）很强，可能压抑了部分真实感受。试着允许自己展现脆弱。";
+    } else if (personaPercentage < 40) {
+      insight = "阴影原型正在浮现，这虽令人不安，却是转化的契机。拥抱你的阴影。";
+    } else if (personaPercentage > 60) {
+      insight = "你的意识与潜意识保持着良好的对话，这是心理健康的表现。";
+    }
+
+    return { personaPercentage, insight };
+  },
+
+  /**
+   * 绘制雷达图
+   */
   drawRadar(data: any[]) {
     const query = wx.createSelectorQuery();
     query.select('#radarCanvas')
       .fields({ node: true, size: true })
       .exec((res) => {
+        if (!res[0]) return;
+        
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
 
@@ -127,70 +229,134 @@ Page({
         const height = res[0].height;
         const centerX = width / 2;
         const centerY = height / 2;
-        const radius = Math.min(width, height) / 2 - 40; // Padding
+        const radius = Math.min(width, height) / 2 - 50;
 
         ctx.clearRect(0, 0, width, height);
 
-        // 1. Draw Background Grid (Spider Web)
-        const levels = 4;
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        
-        for (let j = 1; j <= levels; j++) {
-          ctx.beginPath();
-          const currRadius = (radius / levels) * j;
-          for (let i = 0; i < 12; i++) {
-            const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
-            const x = centerX + Math.cos(angle) * currRadius;
-            const y = centerY + Math.sin(angle) * currRadius;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.closePath();
-          ctx.stroke();
-        }
+        // 绘制背景网格
+        this.drawRadarGrid(ctx, centerX, centerY, radius);
 
-        // Draw Axes
-        ctx.beginPath();
-        for (let i = 0; i < 12; i++) {
-          const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
-          ctx.moveTo(centerX, centerY);
-          ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
-        }
-        ctx.stroke();
+        // 绘制数据
+        this.drawRadarData(ctx, centerX, centerY, radius, data);
 
-        // 2. Draw Data Shape
-        ctx.beginPath();
-        ctx.fillStyle = 'rgba(138, 109, 255, 0.4)'; // Purple transparent
-        ctx.strokeStyle = '#8a6dff';
-        ctx.lineWidth = 2;
+        // 绘制标签
+        this.drawRadarLabels(ctx, centerX, centerY, radius, data);
+      });
+  },
 
-        data.forEach((item, i) => {
-          const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
-          const val = item.value / 100; // Normalized 0-1
-          const r = val * radius;
-          const x = centerX + Math.cos(angle) * r;
-          const y = centerY + Math.sin(angle) * r;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+  /**
+   * 绘制雷达图网格
+   */
+  drawRadarGrid(ctx: any, centerX: number, centerY: number, radius: number) {
+    const levels = 4;
+    
+    // 绘制同心多边形
+    ctx.strokeStyle = 'rgba(138, 109, 255, 0.2)';
+    ctx.lineWidth = 1;
+    
+    for (let j = 1; j <= levels; j++) {
+      ctx.beginPath();
+      const currRadius = (radius / levels) * j;
+      for (let i = 0; i < 12; i++) {
+        const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
+        const x = centerX + Math.cos(angle) * currRadius;
+        const y = centerY + Math.sin(angle) * currRadius;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
 
-        // 3. Draw Labels
-        ctx.fillStyle = '#888';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        data.forEach((item, i) => {
-          const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
-          const labelRadius = radius + 20;
-          const x = centerX + Math.cos(angle) * labelRadius;
-          const y = centerY + Math.sin(angle) * labelRadius;
-          ctx.fillText(item.name, x, y);
-        });
-      })
+    // 绘制轴线
+    ctx.beginPath();
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+    }
+    ctx.stroke();
+  },
+
+  /**
+   * 绘制雷达图数据
+   */
+  drawRadarData(ctx: any, centerX: number, centerY: number, radius: number, data: any[]) {
+    // 创建渐变
+    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+    gradient.addColorStop(0, 'rgba(138, 109, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(138, 109, 255, 0.1)');
+
+    ctx.beginPath();
+    data.forEach((item, i) => {
+      const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
+      const val = item.value / 100;
+      const r = val * radius;
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // 绘制边框
+    ctx.strokeStyle = '#8a6dff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 绘制数据点
+    data.forEach((item, i) => {
+      const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
+      const val = item.value / 100;
+      const r = val * radius;
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+      
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.strokeStyle = '#8a6dff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  },
+
+  /**
+   * 绘制雷达图标签
+   */
+  drawRadarLabels(ctx: any, centerX: number, centerY: number, radius: number, data: any[]) {
+    ctx.fillStyle = '#aaa';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    data.forEach((item, i) => {
+      const angle = (Math.PI * 2 / 12) * i - Math.PI / 2;
+      const labelRadius = radius + 25;
+      const x = centerX + Math.cos(angle) * labelRadius;
+      const y = centerY + Math.sin(angle) * labelRadius;
+      
+      // 绘制图标
+      ctx.font = '14px sans-serif';
+      ctx.fillText(item.icon, x, y - 8);
+      
+      // 绘制名称
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#888';
+      ctx.fillText(item.name, x, y + 8);
+    });
+  },
+
+  /**
+   * 分享报告
+   */
+  onShareAppMessage() {
+    return {
+      title: `我的心灵报告 - ${this.data.totalDreams}个梦境的分析`,
+      path: '/pages/report/report'
+    };
   }
-})
+});
