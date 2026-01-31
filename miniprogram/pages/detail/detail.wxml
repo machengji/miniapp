@@ -1,0 +1,114 @@
+<!-- 梦境详情页 -->
+<navigation-bar title="梦境详情" back="{{true}}" color="white" background="#121212" bindback="goBack"></navigation-bar>
+
+<view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 详情内容 -->
+  <block wx:if="{{!isLoading && dream}}">
+    <!-- 头部信息 -->
+    <view class="header-section">
+      <view class="date-badge">
+        <text class="date-text">{{formattedDate}}</text>
+      </view>
+      <view class="mood-badge" style="background: {{moodColor}}20; color: {{moodColor}}">
+        <text class="mood-icon">{{moodIcon}}</text>
+        <text class="mood-text">{{dream.mood || '未标记'}}</text>
+      </view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="title-section">
+      <text class="dream-title">{{dream.summary || '无题梦境'}}</text>
+    </view>
+
+    <!-- 元数据 -->
+    <view class="meta-section">
+      <view class="meta-item">
+        <text class="meta-label">清晰度</text>
+        <view class="clarity-bar">
+          <view class="clarity-fill" style="width: {{dream.clarity * 20}}%; background: {{moodColor}}"></view>
+        </view>
+        <text class="clarity-value">{{dream.clarity}}/5</text>
+      </view>
+    </view>
+
+    <!-- 关键词 -->
+    <view class="keywords-section" wx:if="{{dream.keywords && dream.keywords.length > 0}}">
+      <text class="section-label">关键词</text>
+      <view class="keywords-list">
+        <text class="keyword-tag" wx:for="{{dream.keywords}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 原始内容 -->
+    <view class="content-section">
+      <text class="section-label">梦境记录</text>
+      <view class="content-box">
+        <text class="content-text" user-select="true">{{dream.content}}</text>
+      </view>
+    </view>
+
+    <!-- AI分析 -->
+    <view class="analysis-section">
+      <view class="section-header">
+        <text class="section-label">AI分析</text>
+        <view class="copy-btn" bindtap="copyAnalysis">
+          <text class="copy-icon">📋</text>
+          <text class="copy-text">复制</text>
+        </view>
+      </view>
+
+      <!-- 思考过程 -->
+      <view class="thought-box" wx:if="{{dream.thought}}">
+        <view class="thought-header" bindtap="toggleThought">
+          <view class="thought-title">
+            <text class="brain-icon">✦</text>
+            <text>深度分析回路</text>
+          </view>
+          <text class="toggle-icon {{isThoughtExpanded ? 'expanded' : ''}}">▼</text>
+        </view>
+        <view class="thought-content" wx:if="{{isThoughtExpanded}}">
+          <text user-select="true">{{dream.thought}}</text>
+        </view>
+      </view>
+
+      <!-- 分析正文 -->
+      <view class="analysis-box">
+        <text class="analysis-text" user-select="true">{{dream.content}}</text>
+      </view>
+    </view>
+
+    <!-- 12原型得分（如果有） -->
+    <view class="archetype-section" wx:if="{{dream.archetypeScores}}">
+      <text class="section-label">原型能量分布</text>
+      <view class="archetype-list">
+        <view class="archetype-item" wx:for="{{[['天真者','innocent'],['孤儿','orphan'],['英雄','hero'],['照顾者','caregiver'],['探索者','explorer'],['反叛者','rebel'],['情人','lover'],['创造者','creator'],['小丑','jester'],['智者','sage'],['魔术师','magician'],['统治者','ruler']]}}" wx:key="*this">
+          <text class="archetype-name">{{item[0]}}</text>
+          <view class="archetype-bar">
+            <view class="archetype-fill" style="width: {{dream.archetypeScores[item[1]] || 20}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <button class="share-btn" open-type="share">
+        <text class="btn-icon">↗</text>
+        <text class="btn-text">分享</text>
+      </button>
+      <view class="delete-btn" bindtap="deleteDream">
+        <text class="btn-icon">🗑</text>
+        <text class="btn-text">删除</text>
+      </view>
+    </view>
+
+    <!-- 底部间距 -->
+    <view style="height: 60rpx;"></view>
+  </block>
+</view>

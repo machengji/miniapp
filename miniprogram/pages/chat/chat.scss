@@ -1,5 +1,5 @@
 page {
-  background-color: #121212; // 极深灰，接近黑
+  background-color: #121212;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@ page {
   padding: 20rpx;
   box-sizing: border-box;
   padding-bottom: 40rpx;
-  padding-top: 100px; // Adjust based on nav bar
+  padding-top: 100px;
 }
 
 .intro-card {
@@ -64,7 +64,7 @@ page {
   margin-bottom: 40rpx;
   display: flex;
   width: 100%;
-  padding: 0 10rpx; // Slight side padding
+  padding: 0 10rpx;
   box-sizing: border-box;
   
   &.user {
@@ -77,7 +77,7 @@ page {
 }
 
 .avatar {
-  width: 70rpx; // Slightly larger
+  width: 70rpx;
   height: 70rpx;
   background: #2a2a2a;
   border: 1px solid #333;
@@ -89,7 +89,7 @@ page {
   color: #888;
   margin-right: 24rpx;
   flex-shrink: 0;
-  margin-top: 0; // Align top
+  margin-top: 0;
   font-family: 'Times New Roman', serif;
 }
 
@@ -109,9 +109,9 @@ page {
   box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
   
   &.user-bubble {
-    background: linear-gradient(135deg, #4a4a4a, #2a2a2a); // Subtle Gradient
+    background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
     color: #fff;
-    border-top-right-radius: 4rpx; // Visual cue
+    border-top-right-radius: 4rpx;
     border: 1px solid rgba(255,255,255,0.05);
   }
   
@@ -120,7 +120,7 @@ page {
     color: #d1d1d1;
     padding-left: 0;
     margin-top: 10rpx;
-    font-weight: 300; // Lighter weight for reading
+    font-weight: 300;
   }
 }
 
@@ -129,7 +129,7 @@ page {
   background: #181818;
   border-radius: 12rpx;
   border: 1px solid #2a2a2a;
-  border-left: 3px solid #8a6dff; // Accent border
+  border-left: 3px solid #8a6dff;
   margin-bottom: 16rpx;
   overflow: hidden;
   width: 100%;
@@ -165,7 +165,7 @@ page {
     padding: 24rpx;
     font-size: 24rpx;
     color: #888;
-    font-family: 'Courier New', monospace; // Monospace for 'code/thought' feel
+    font-family: 'Courier New', monospace;
     background: #151515;
     line-height: 1.6;
     white-space: pre-wrap;
@@ -182,10 +182,11 @@ page {
   margin-left: 8rpx;
 }
 
+// ===== 输入区域样式修复 =====
 .input-area {
   padding: 24rpx 30rpx;
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  background: rgba(26, 26, 26, 0.95);
+  background: rgba(30, 30, 30, 0.98);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
@@ -193,22 +194,24 @@ page {
   
   .chat-input {
     flex: 1;
-    background: #2a2a2a;
+    background: #3a3a3a;
     color: #fff;
     padding: 22rpx 34rpx;
     border-radius: 40rpx;
     margin-right: 20rpx;
     font-size: 30rpx;
-    border: 1px solid transparent;
+    border: 1px solid #444;
     transition: border 0.2s;
     
     &:focus {
-      border-color: #555;
+      border-color: #8a6dff;
+      background: #404040;
     }
   }
   
   .input-placeholder {
-    color: #555;
+    color: #888;
+    font-size: 28rpx;
   }
   
   .send-btn {
@@ -220,6 +223,7 @@ page {
     align-items: center;
     justify-content: center;
     color: #666;
+    font-size: 36rpx;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
     &.active {
@@ -242,7 +246,7 @@ page {
   align-items: center;
   justify-content: center;
   font-size: 44rpx;
-  color: #666;
+  color: #888;
   margin-right: 12rpx;
   border-radius: 50%;
   transition: all 0.2s;
@@ -253,24 +257,37 @@ page {
   }
 }
 
+// ===== 梦境标记弹窗样式修复 =====
 .metadata-panel {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(140rpx + env(safe-area-inset-bottom));
-  background: rgba(34, 34, 34, 0.95);
+  bottom: 0;
+  background: rgba(40, 40, 40, 0.98);
   backdrop-filter: blur(20px);
   border-top-left-radius: 36rpx;
   border-top-right-radius: 36rpx;
-  padding: 40rpx;
-  transform: translateY(120%);
-  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); // Exponential ease
-  z-index: 90;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 -20rpx 60rpx rgba(0,0,0,0.6);
+  padding: 30rpx 40rpx 40rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  z-index: 100;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -10rpx 40rpx rgba(0,0,0,0.5);
 
   &.visible {
     transform: translateY(0);
+  }
+  
+  // 拖动指示条
+  &::before {
+    content: '';
+    display: block;
+    width: 60rpx;
+    height: 6rpx;
+    background: #555;
+    border-radius: 3rpx;
+    margin: 0 auto 30rpx;
   }
   
   .panel-header {
@@ -278,47 +295,83 @@ page {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30rpx;
-    font-size: 30rpx;
+    font-size: 32rpx;
     font-weight: 600;
-    color: #e0e0e0;
+    color: #fff;
 
     .close-btn {
-      padding: 10rpx 20rpx;
+      width: 60rpx;
+      height: 60rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #888;
-      font-size: 40rpx;
+      font-size: 48rpx;
       line-height: 1;
+      border-radius: 50%;
+      
+      &:active {
+        background: rgba(255,255,255,0.1);
+      }
     }
   }
 
   .section-title {
-    font-size: 24rpx;
-    color: #888;
+    font-size: 26rpx;
+    color: #aaa;
     margin-bottom: 20rpx;
-    margin-top: 10rpx;
+    margin-top: 20rpx;
+    font-weight: 500;
   }
 
   .tags-scroll {
     display: flex;
     white-space: nowrap;
-    height: 70rpx;
+    height: 76rpx;
     margin-bottom: 30rpx;
     
     .tag {
-      display: inline-block;
-      padding: 10rpx 24rpx;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12rpx 28rpx;
       background: #333;
-      color: #aaa;
-      border-radius: 30rpx;
+      color: #bbb;
+      border-radius: 32rpx;
       font-size: 26rpx;
       margin-right: 20rpx;
-      border: 1px solid transparent;
+      border: 2rpx solid transparent;
       transition: all 0.2s;
+      min-width: 100rpx;
 
       &.selected {
         background: rgba(138, 109, 255, 0.2);
         color: #8a6dff;
         border-color: #8a6dff;
       }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+  
+  // 滑块样式修复
+  slider {
+    margin: 0;
+    .wx-slider-wrapper {
+      height: 40rpx;
+    }
+    .wx-slider-track {
+      background: #8a6dff !important;
+      height: 8rpx;
+    }
+    .wx-slider-thumb {
+      width: 32rpx;
+      height: 32rpx;
+      background: #8a6dff;
+      border: 4rpx solid #fff;
+      box-shadow: 0 4rpx 12rpx rgba(138, 109, 255, 0.5);
     }
   }
 }
@@ -332,4 +385,14 @@ page {
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+// 安全区域适配
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .input-area {
+    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  }
+  .metadata-panel {
+    padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  }
 }

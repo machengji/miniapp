@@ -211,9 +211,35 @@ ${memoryContext}
         }
       }).then((res: any) => {
         console.log("Dream saved:", res);
-        wx.showToast({ title: '梦境已记录', icon: 'success' });
+        if (res.result && res.result.success) {
+          const summary = res.result.summary || '梦境已记录';
+          const keywords = res.result.keywords || [];
+          wx.showToast({ 
+            title: `已记录:${summary.substring(0, 6)}${summary.length > 6 ? '...' : ''}`, 
+            icon: 'none',
+            duration: 2000
+          });
+          
+          // 更新用户统计（连续天数等）
+          wx.cloud.callFunction({
+            name: 'updateUser',
+            data: { action: 'recordDream' }
+          }).catch(err => {
+            console.error("更新用户统计失败:", err);
+          });
+          
+          // 触发全局事件通知首页刷新
+          const app = getApp<IAppOption>();
+          if (app.globalData) {
+            app.globalData.refreshDreamList = true;
+          }
+        } else {
+          console.error("Save returned error:", res);
+          wx.showToast({ title: '保存失败', icon: 'error' });
+        }
       }).catch(err => {
         console.error("Failed to save dream:", err);
+        wx.showToast({ title: '保存失败', icon: 'error' });
       });
       // ------------------
 

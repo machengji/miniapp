@@ -1,42 +1,89 @@
-<!--index.wxml-->
+<!-- 首页：梦境日记 + 用户统计 -->
 <navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212"></navigation-bar>
-<scroll-view class="journal-list" scroll-y type="list">
+
+<scroll-view class="journal-list" scroll-y type="list" refresher-enabled="{{true}}" refresher-triggered="{{isLoading}}" bindrefresherrefresh="onPullDownRefresh">
+  
+  <!-- 头部区域 -->
   <view class="header">
-    <view class="header-top" style="display: flex; justify-content: space-between; align-items: flex-start;">
-      <view>
+    <view class="header-top">
+      <view class="title-section">
         <text class="title">梦境日志</text>
         <text class="subtitle">记录无意识的低语</text>
       </view>
-      <view class="map-btn" bindtap="goToReport" style="background: #2a2a2a; padding: 16rpx; border-radius: 50%; width: 80rpx; height: 80rpx; display: flex; align-items: center; justify-content: center; border: 1px solid #333;">
-        <text style="font-size: 40rpx;">🔮</text>
+      <view class="map-btn" bindtap="goToReport">
+        <text class="map-icon">🔮</text>
+      </view>
+    </view>
+    
+    <!-- 用户统计卡片 -->
+    <view class="stats-card" wx:if="{{stats.totalDreams > 0}}">
+      <view class="stat-item">
+        <text class="stat-value">{{stats.totalDreams}}</text>
+        <text class="stat-label">记录梦境</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.streakDays}}</text>
+        <text class="stat-label">连续天数</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.dominantMood}}</text>
+        <text class="stat-label">主导情绪</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.avgClarity}}</text>
+        <text class="stat-label">平均清晰度</text>
       </view>
     </view>
   </view>
 
-  <view class="dream-card" wx:for="{{dreams}}" wx:key="_id">
+  <!-- 最近记录标题 -->
+  <view class="section-header" wx:if="{{dreams.length > 0}}">
+    <text class="section-title">最近记录</text>
+    <text class="section-count">共 {{stats.totalDreams}} 条</text>
+  </view>
+
+  <!-- 梦境列表 -->
+  <view class="dream-card" wx:for="{{dreams}}" wx:key="_id" bindtap="viewDreamDetail" data-id="{{item._id}}">
     <view class="card-date">
       <text class="day">{{item.day}}</text>
       <text class="month">{{item.month}}</text>
     </view>
     <view class="card-content">
-      <text class="card-title">{{item.summary || '无题梦境'}}</text>
+      <view class="card-title-row">
+        <text class="card-title">{{item.displayTitle}}</text>
+        <text class="mood-emoji" style="color: {{item.moodColor}}">{{item.moodIcon}}</text>
+      </view>
       <view class="card-meta">
-        <text class="mood-tag" wx:if="{{item.mood && item.mood !== 'unknown'}}">#{{item.mood}}</text>
-        <text class="clarity-dots" style="color: #666; margin-left: 10rpx;">清晰度 {{item.clarity}}/5</text>
+        <text class="mood-tag" style="background: {{item.moodColor}}20; color: {{item.moodColor}}" wx:if="{{item.mood && item.mood !== 'unknown'}}">
+          {{item.mood}}
+        </text>
+        <view class="clarity-bar" wx:if="{{item.clarity}}">
+          <view class="clarity-fill" style="width: {{item.clarity * 20}}%; background: {{item.moodColor}}"></view>
+        </view>
       </view>
       <text class="card-preview">{{item.content}}</text>
+      <!-- 关键词标签 -->
+      <view class="keywords" wx:if="{{item.keywords && item.keywords.length > 0}}">
+        <text class="keyword-tag" wx:for="{{item.keywords}}" wx:for-item="kw" wx:key="*this">{{kw}}</text>
+      </view>
     </view>
   </view>
   
-  <view class="empty-state" wx:if="{{dreams.length === 0}}">
-    <text>尚未记录任何梦境</text>
-    <text class="sub-text">点击右下角按钮，开启你的潜意识探索之旅。</text>
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{dreams.length === 0 && !isLoading}}">
+    <view class="empty-icon">🌙</view>
+    <text class="empty-title">尚未记录任何梦境</text>
+    <text class="empty-subtitle">点击右下角按钮，开启你的潜意识探索之旅</text>
   </view>
   
-  <!-- Spacing for FAB -->
-  <view style="height: 120rpx;"></view>
+  <!-- 底部间距 -->
+  <view style="height: 160rpx;"></view>
 </scroll-view>
 
+<!-- 悬浮按钮 -->
 <view class="fab" bindtap="goToChat">
-  <text>+</text>
+  <text class="fab-icon">+</text>
 </view>

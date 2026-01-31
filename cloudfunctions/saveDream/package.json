@@ -1,8 +1,11 @@
 {
   "name": "saveDream",
   "version": "1.0.0",
-  "description": "Save dream to database and generate summary",
+  "description": "保存梦境记录到云数据库",
   "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "author": "Aletheia",
   "license": "MIT",
   "dependencies": {

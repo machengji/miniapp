@@ -2,6 +2,6 @@
   "usingComponents": {
     "navigation-bar": "/components/navigation-bar/navigation-bar"
   },
-  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "梦境详情",
   "backgroundColor": "#121212"
 }
