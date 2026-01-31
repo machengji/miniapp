@@ -1,3 +1,5 @@
+import { memoryService, MemoryContext } from '../../services/memory.service';
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -120,38 +122,31 @@ Page({
         history.shift();
       }
 
-      // --- Memory Injection Start ---
+      // --- Memory Injection Start (Optimized) ---
       let memoryContext = "";
+      let memoryData: MemoryContext | null = null;
+      
       try {
-        const db = wx.cloud.database();
-        const res = await db.collection('dreams')
-          .orderBy('createTime', 'desc')
-          .limit(5)
-          .get();
+        memoryData = await memoryService.loadMemoryContext(content);
+        memoryContext = memoryData.text;
         
-        const pastDreams = res.data;
-        if (pastDreams.length > 0) {
-          memoryContext = "\n\n【长期记忆档案 (Long-term Memory)】\n该用户之前的梦境记录如下（按时间倒序）：\n";
-          pastDreams.forEach((d: any, i: number) => {
-            // Format: 1. [Mood] Summary - Content snippet...
-            const dateStr = d.createTime ? new Date(d.createTime).toLocaleDateString() : '未知日期';
-            const snippet = d.content.length > 40 ? d.content.substring(0, 40) + "..." : d.content;
-            memoryContext += `${i + 1}. [${dateStr}] [${d.mood || 'N/A'}] ${d.summary || '无题'}：${snippet}\n`;
-          });
-          memoryContext += "\n【对比分析指令】\n请务必将本次梦境与上述【长期记忆档案】进行横向对比。\n1. 寻找重复出现的意象（Recurrent Symbols）：是否有旧的意象再次出现？形态有何变化？\n2. 识别情绪曲线：用户的情绪是恶化了还是改善了？\n3. 在回复中显式地指出这些联系（例如：“这让你想起了上周那个关于...的梦...”）。";
+        // 如果有相关记忆，打印日志
+        if (memoryData.relatedDreams.length > 0) {
+          console.log(`[Memory] 加载了 ${memoryData.relatedDreams.length} 条相关梦境`);
+          console.log(`[Memory] 反复出现的意象:`, memoryData.recurrentSymbols);
+          console.log(`[Memory] 情绪趋势:`, memoryData.emotionTrend);
         }
       } catch (err) {
-        console.error("Failed to load memory context:", err);
-        // Fail silently, proceed without memory
+        console.error("[Memory] 加载记忆失败:", err);
+        // 失败时继续，不使用记忆
       }
       // --- Memory Injection End ---
 
+      // 构建系统提示词
+      const systemPrompt = this.buildSystemPrompt(memoryContext, memoryData);
+      
       const finalMessages = [
-        { role: 'system', content: `
-你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
-在回复用户之前，你必须先进行推理，并将推理过程用 <think> 和 </think> 标签包裹起来放在最前面。
-${memoryContext}
-` },
+        { role: 'system', content: systemPrompt },
         ...history
       ];
 
@@ -254,6 +249,45 @@ ${memoryContext}
         this.setData({ isStreaming: false, scrollTarget: 'bottom-anchor' });
         this.updateLastMessage({ isStreaming: false });
     }
+  },
+
+  /**
+   * 构建系统提示词
+   */
+  buildSystemPrompt(memoryContext: string, memoryData: MemoryContext | null): string {
+    let prompt = `你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
+
+核心原则：
+1. **严禁算命**：绝对不要使用"吉凶"、"运势"、"前世"等迷信词汇
+2. **深度挖掘**：使用荣格概念（阴影、阿尼玛/阿尼姆斯、面具、共时性、集体无意识）来解释
+3. **思考外显**：在回答前，先在 <think> 标签中进行深度推理，分析用户的防御机制和潜意识原型
+4. **冷峻而包容**：语气保持神秘、客观、深邃，不要过于热情客套
+5. **联系历史**：如果提供了历史梦境档案，必须显式地指出梦境之间的联系
+
+分析框架：
+- 识别梦中的原型意象（水、火、动物、人物等）
+- 探索阴影投射（被压抑的部分）
+- 分析阿尼玛/阿尼姆斯（内在异性形象）
+- 解读集体无意识中的象征
+- 注意重复出现的模式`;
+
+    // 添加记忆上下文（如果有）
+    if (memoryContext) {
+      prompt += '\n\n' + memoryContext;
+    }
+
+    // 添加个性化提示（根据记忆数据）
+    if (memoryData && memoryData.recurrentSymbols.length > 0) {
+      prompt += `\n\n【特别提醒】该用户反复梦见"${memoryData.recurrentSymbols.slice(0, 3).join('、')}"等意象，这可能指向其核心情结。请特别关注这些重复意象的变化。`;
+    }
+
+    prompt += `\n\n回复格式：
+<think>
+你的深度推理过程...
+</think>
+正式回复内容...`;
+
+    return prompt;
   },
 
   // 模拟打字机效果：先打思考，再打正文
