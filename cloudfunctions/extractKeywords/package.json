@@ -1,0 +1,9 @@
+{
+  "name": "extractKeywords",
+  "version": "1.0.0",
+  "description": "从梦境内容中提取关键词和原型分析",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}
