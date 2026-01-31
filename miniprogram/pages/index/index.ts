@@ -36,22 +36,25 @@ Page({
       avgClarity: '0.0',
       dominantMood: '-'
     } as UserStats,
-    
+
     // 梦境列表
     dreams: [] as Dream[],
-    
+
     // 对话历史列表
     conversations: [] as Conversation[],
-    
+
     // 加载状态
     isLoading: true,
-    
+
     // 用户信息
     userInfo: null as WechatMiniprogram.UserInfo | null,
-    
+
     // 每日卡片
     showDailyCard: false,
-    hasDrawnCard: false
+    hasDrawnCard: false,
+
+    // 导航栏高度
+    navBarHeight: 0,
   },
 
   onLoad() {
@@ -66,6 +69,9 @@ Page({
     
     // 检查今天是否已抽卡
     this.checkDailyCard();
+    
+    // 加载数据
+    this.loadData();
   },
   
   /**
@@ -82,6 +88,7 @@ Page({
    */
   showDailyCard() {
     this.setData({ showDailyCard: true });
+    wx.vibrateShort({ type: 'light' });
   },
   
   /**
@@ -145,12 +152,19 @@ Page({
       this.setData({
         stats: statsRes,
         dreams: dreamsRes,
-        conversations: conversationsRes,
-        isLoading: false
+        conversations: conversationsRes
+      }, () => {
+        // 延迟关闭 loading，确保动画平滑展示
+        setTimeout(() => {
+          this.setData({ isLoading: false });
+        }, 800);
       });
     } catch (err) {
       console.error('加载数据失败:', err);
-      this.setData({ isLoading: false });
+      // 即使失败也要关闭 loading
+      setTimeout(() => {
+        this.setData({ isLoading: false });
+      }, 800);
       wx.showToast({ title: '加载失败', icon: 'error' });
     }
   },
@@ -325,6 +339,7 @@ Page({
    * 跳转到聊天页（新建对话）
    */
   goToChat() {
+    wx.vibrateShort({ type: 'light' });
     wx.navigateTo({ url: '../chat/chat' });
   },
 
@@ -393,6 +408,14 @@ Page({
     wx.navigateTo({
       url: `../detail/detail?id=${id}`
     });
+  },
+
+  /**
+   * 导航栏高度就绪回调
+   */
+  onNavBarHeightReady(e: any) {
+    const { totalHeight } = e.detail;
+    this.setData({ navBarHeight: totalHeight });
   },
 
   /**

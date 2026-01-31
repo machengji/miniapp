@@ -1,38 +1,25 @@
 page {
   background-color: #121212;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
   color: #e0e0e0;
+  height: 100vh;
+  width: 100vw;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  overflow: hidden;
 }
 
 .chat-container {
-  flex: 1;
-  padding: 20rpx;
+  height: 100vh;
+  padding-top: 108px;
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+  padding-bottom: 140rpx;
   box-sizing: border-box;
-  padding-bottom: 40rpx;
-  padding-top: 20rpx;
 }
 
-// 滚动条样式
+// 滚动条样式 - 隐藏
 scroll-view {
   &::-webkit-scrollbar {
-    width: 8rpx;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #1a1a1a;
-    border-radius: 4rpx;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 4rpx;
-
-    &:hover {
-      background: #555;
-    }
+    display: none;
   }
 }
 
@@ -41,9 +28,9 @@ scroll-view {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 10vh;
+  margin-top: 20vh;
   opacity: 0.8;
-  
+
   .logo {
     font-size: 80rpx;
     font-weight: 200;
@@ -87,11 +74,12 @@ scroll-view {
   width: 100%;
   padding: 0 10rpx;
   box-sizing: border-box;
-  
+  animation: slideUp var(--duration-base) var(--easing-smooth);
+
   &.user {
     justify-content: flex-end;
   }
-  
+
   &.ai {
     justify-content: flex-start;
   }
@@ -128,14 +116,14 @@ scroll-view {
   position: relative;
   word-break: break-all;
   box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
-  
+
   &.user-bubble {
-    background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+    background: var(--primary-gradient);
     color: #fff;
     border-top-right-radius: 4rpx;
     border: 1px solid rgba(255,255,255,0.05);
   }
-  
+
   &.ai-bubble {
     background-color: transparent;
     color: #d1d1d1;
@@ -155,7 +143,7 @@ scroll-view {
   overflow: hidden;
   width: 100%;
   box-shadow: inset 0 0 20rpx rgba(0,0,0,0.5);
-  
+
   .thought-header {
     display: flex;
     align-items: center;
@@ -165,14 +153,14 @@ scroll-view {
     background: #222;
     text-transform: uppercase;
     letter-spacing: 1rpx;
-    
+
     .icon-brain {
       margin-right: 12rpx;
-      color: #8a6dff; 
+      color: var(--accent-purple);
       font-size: 24rpx;
       animation: pulse 3s infinite;
     }
-    
+
     .toggle-icon {
       margin-left: auto;
       transition: transform 0.3s;
@@ -181,7 +169,7 @@ scroll-view {
       }
     }
   }
-  
+
   .thought-content {
     padding: 24rpx;
     font-size: 24rpx;
@@ -205,78 +193,169 @@ scroll-view {
 
 // ===== 输入区域样式修复 =====
 .input-area {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   padding: 24rpx 30rpx;
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: rgba(30, 30, 30, 0.98);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  border-top: 1px solid #333;
-  
-  .chat-input {
+  border-top: 1rpx solid #333;
+  z-index: 50;
+  gap: 16rpx;
+
+  .input-wrapper {
     flex: 1;
-    background: #3a3a3a;
-    color: #fff;
-    padding: 22rpx 34rpx;
-    border-radius: 40rpx;
-    margin-right: 20rpx;
-    font-size: 30rpx;
-    border: 1px solid #444;
-    transition: border 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 12rpx;
+  }
+
+  .mood-tags-scroll {
+    width: 100%;
+    height: 52rpx;
+    margin-bottom: 8rpx;
     
-    &:focus {
-      border-color: #8a6dff;
-      background: #404040;
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mood-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10rpx 20rpx;
+      background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
+      color: #bbb;
+      border-radius: 24rpx;
+      font-size: 22rpx;
+      margin-right: 10rpx;
+      border: 1rpx solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s;
+      min-width: 72rpx;
+      height: 44rpx;
+      box-sizing: border-box;
+
+      &:last-child {
+        margin-right: 20rpx;
+      }
+
+      &.selected {
+        background: linear-gradient(145deg, rgba(201, 168, 108, 0.2), rgba(201, 168, 108, 0.1));
+        color: #D4AF37;
+        border-color: rgba(201, 168, 108, 0.4);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
     }
   }
-  
+
+  .chat-input {
+    width: 100%;
+    background: var(--bg-input);
+    color: #fff;
+    padding: 22rpx 34rpx;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-md);
+    border: 1px solid var(--border-secondary);
+    transition: all 0.2s var(--easing-smooth);
+
+    &:focus {
+      border-color: var(--primary);
+      background: #404040;
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+  }
+
   .input-placeholder {
     color: #888;
     font-size: 28rpx;
   }
-  
+
   .send-btn {
-    width: 88rpx;
-    height: 88rpx;
-    background: #333;
+    width: 76rpx;
+    height: 76rpx;
+    background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
-    font-size: 36rpx;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1rpx solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 4rpx 12rpx rgba(0, 0, 0, 0.3),
+      inset 0 1rpx 2rpx rgba(255, 255, 255, 0.05);
+    transition: all 0.2s var(--easing-bounce);
+    flex-shrink: 0;
     
+    image {
+      width: 36rpx;
+      height: 36rpx;
+      opacity: 0.6;
+    }
+
     &.active {
-      background: #8a6dff;
-      color: #fff;
-      box-shadow: 0 4rpx 12rpx rgba(138, 109, 255, 0.4);
+      background: var(--primary-gradient);
+      border-color: rgba(201, 168, 108, 0.3);
+      box-shadow: 
+        0 6rpx 20rpx rgba(201, 168, 108, 0.4),
+        inset 0 1rpx 2rpx rgba(255, 255, 255, 0.2);
       transform: scale(1.05);
+      
+      image {
+        opacity: 1;
+        filter: brightness(0.1);
+      }
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+  }
+}
+
+  .meta-toggle-btn {
+    width: 76rpx;
+    height: 76rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
+    border: 1rpx solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 4rpx 12rpx rgba(0, 0, 0, 0.3),
+      inset 0 1rpx 2rpx rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    
+    image {
+      width: 36rpx;
+      height: 36rpx;
+      opacity: 0.8;
+    }
+
+    &.active {
+      background: linear-gradient(145deg, rgba(201, 168, 108, 0.2), rgba(201, 168, 108, 0.1));
+      border-color: rgba(201, 168, 108, 0.4);
+      box-shadow: 
+        0 4rpx 16rpx rgba(201, 168, 108, 0.2),
+        inset 0 1rpx 2rpx rgba(255, 255, 255, 0.1);
+        
+      image {
+        opacity: 1;
+        filter: brightness(1.2);
+      }
     }
     
     &:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
   }
-}
-
-.meta-toggle-btn {
-  width: 80rpx;
-  height: 80rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 44rpx;
-  color: #888;
-  margin-right: 12rpx;
-  border-radius: 50%;
-  transition: all 0.2s;
-
-  &.active {
-    color: #8a6dff;
-    background: rgba(138, 109, 255, 0.1);
-  }
-}
 
 // ===== 梦境标记弹窗样式修复 =====
 .metadata-panel {
@@ -284,22 +363,22 @@ scroll-view {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(40, 40, 40, 0.98);
-  backdrop-filter: blur(20px);
-  border-top-left-radius: 36rpx;
-  border-top-right-radius: 36rpx;
+  background: rgba(35, 35, 35, 0.98);
+  backdrop-filter: blur(30px);
+  border-top-left-radius: 40rpx;
+  border-top-right-radius: 40rpx;
   padding: 30rpx 40rpx 40rpx;
   padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-  z-index: 100;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 -10rpx 40rpx rgba(0,0,0,0.5);
+  z-index: 200;
+  border-top: 1rpx solid rgba(255,255,255,0.08);
+  box-shadow: 0 -20rpx 60rpx rgba(0,0,0,0.6);
 
   &.visible {
     transform: translateY(0);
   }
-  
+
   // 拖动指示条
   &::before {
     content: '';
@@ -310,7 +389,7 @@ scroll-view {
     border-radius: 3rpx;
     margin: 0 auto 30rpx;
   }
-  
+
   .panel-header {
     display: flex;
     justify-content: space-between;
@@ -330,7 +409,7 @@ scroll-view {
       font-size: 48rpx;
       line-height: 1;
       border-radius: 50%;
-      
+
       &:active {
         background: rgba(255,255,255,0.1);
       }
@@ -346,37 +425,52 @@ scroll-view {
   }
 
   .tags-scroll {
-    display: flex;
-    white-space: nowrap;
-    height: 76rpx;
-    margin-bottom: 30rpx;
+    width: 100%;
+    height: 88rpx;
+    margin-bottom: 20rpx;
     
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
     .tag {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 12rpx 28rpx;
-      background: #333;
-      color: #bbb;
-      border-radius: 32rpx;
+      padding: 16rpx 32rpx;
+      background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
+      color: #ccc;
+      border-radius: 36rpx;
       font-size: 26rpx;
-      margin-right: 20rpx;
-      border: 2rpx solid transparent;
+      margin-right: 16rpx;
+      border: 2rpx solid rgba(255, 255, 255, 0.05);
       transition: all 0.2s;
       min-width: 100rpx;
+      height: 64rpx;
+      box-sizing: border-box;
+      box-shadow: 
+        0 2rpx 8rpx rgba(0, 0, 0, 0.2),
+        inset 0 1rpx 2rpx rgba(255, 255, 255, 0.05);
+
+      &:last-child {
+        margin-right: 40rpx;
+      }
 
       &.selected {
-        background: rgba(138, 109, 255, 0.2);
-        color: #8a6dff;
-        border-color: #8a6dff;
+        background: linear-gradient(145deg, rgba(201, 168, 108, 0.25), rgba(201, 168, 108, 0.15));
+        color: #D4AF37;
+        border-color: rgba(201, 168, 108, 0.5);
+        box-shadow: 
+          0 2rpx 12rpx rgba(201, 168, 108, 0.2),
+          inset 0 1rpx 2rpx rgba(255, 255, 255, 0.1);
       }
-      
+
       &:active {
-        transform: scale(0.95);
+        transform: scale(0.96);
       }
     }
   }
-  
+
   // 滑块样式修复
   slider {
     margin: 0;
@@ -384,22 +478,22 @@ scroll-view {
       height: 40rpx;
     }
     .wx-slider-track {
-      background: #8a6dff !important;
+      background: var(--primary) !important;
       height: 8rpx;
     }
     .wx-slider-thumb {
       width: 32rpx;
       height: 32rpx;
-      background: #8a6dff;
+      background: var(--primary);
       border: 4rpx solid #fff;
-      box-shadow: 0 4rpx 12rpx rgba(138, 109, 255, 0.5);
+      box-shadow: var(--shadow-primary);
     }
   }
 }
 
 @keyframes pulse {
   0% { opacity: 0.5; }
-  50% { opacity: 1; text-shadow: 0 0 10rpx rgba(138, 109, 255, 0.5); }
+  50% { opacity: 1; text-shadow: 0 0 10rpx var(--accent-purple); }
   100% { opacity: 0.5; }
 }
 

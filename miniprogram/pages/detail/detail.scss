@@ -1,64 +1,19 @@
 page {
   background-color: #121212;
   color: #e0e0e0;
-  min-height: 100vh;
+  height: 100vh;
 }
 
-// ===== 自定义导航栏 =====
-.nav-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 88rpx;
-  background: linear-gradient(180deg, rgba(18, 18, 18, 0.95) 0%, rgba(18, 18, 18, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30rpx;
-  padding-top: var(--status-bar-height, 0);
-  z-index: 1000;
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
-
-  .nav-back {
-    display: flex;
-    align-items: center;
-    padding: 10rpx 20rpx 10rpx 0;
-    
-    .back-icon {
-      font-size: 32rpx;
-      color: #fff;
-      margin-right: 8rpx;
-    }
-    
-    .back-text {
-      font-size: 28rpx;
-      color: #fff;
-    }
-    
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  .nav-title {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #fff;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .nav-placeholder {
-    width: 100rpx;
-  }
+.detail-scroll {
+  height: 100vh;
+  padding-top: 108px;
+  padding-bottom: 40rpx;
+  box-sizing: border-box;
 }
 
 .container {
   padding: 40rpx;
-  padding-top: calc(88rpx + var(--status-bar-height, 0) + 40rpx);
+  padding-bottom: 40rpx;
 }
 
 // ===== 加载状态 =====
@@ -72,8 +27,8 @@ page {
   .loading-spinner {
     width: 60rpx;
     height: 60rpx;
-    border: 4rpx solid #333;
-    border-top-color: #8a6dff;
+    border: 4rpx solid var(--border-secondary);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -126,7 +81,7 @@ page {
     font-weight: 700;
     color: #fff;
     line-height: 1.4;
-    background: linear-gradient(135deg, #e0e0e0 0%, #a8a8a8 100%);
+    background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -142,6 +97,7 @@ page {
   .meta-item {
     display: flex;
     align-items: center;
+;
     gap: 20rpx;
     
     .meta-label {
@@ -259,59 +215,59 @@ page {
 }
 
 // ===== 思考过程 =====
-.thought-box {
-  background: #181818;
-  border-radius: 16rpx;
-  border: 1px solid #2a2a2a;
-  border-left: 4rpx solid #8a6dff;
-  margin-bottom: 24rpx;
-  overflow: hidden;
-  
-  .thought-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24rpx;
-    background: #222;
+  .thought-box {
+    background: #181818;
+    border-radius: 16rpx;
+    border: 1px solid #2a2a2a;
+    border-left: 4rpx solid var(--accent-purple);
+    margin-bottom: 24rpx;
+    overflow: hidden;
     
-    .thought-title {
+    .thought-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
+      padding: 24rpx;
+      background: #222;
+      
+      .thought-title {
+        display: flex;
+        align-items: center;
+        font-size: 26rpx;
+        color: #888;
+        
+        .brain-icon {
+          color: var(--accent-purple);
+          margin-right: 12rpx;
+          font-size: 28rpx;
+          animation: pulse 3s infinite;
+        }
+      }
+      
+      .toggle-icon {
+        font-size: 24rpx;
+        color: #666;
+        transition: transform 0.3s;
+        
+        &.expanded {
+          transform: rotate(180deg);
+        }
+      }
+    }
+    
+    .thought-content {
+      padding: 28rpx;
       font-size: 26rpx;
       color: #888;
-      
-      .brain-icon {
-        color: #8a6dff;
-        margin-right: 12rpx;
-        font-size: 28rpx;
-        animation: pulse 3s infinite;
-      }
-    }
-    
-    .toggle-icon {
-      font-size: 24rpx;
-      color: #666;
-      transition: transform 0.3s;
-      
-      &.expanded {
-        transform: rotate(180deg);
-      }
+      font-family: 'Courier New', monospace;
+      line-height: 1.7;
+      background: #151515;
+      white-space: pre-wrap;
     }
   }
-  
-  .thought-content {
-    padding: 28rpx;
-    font-size: 26rpx;
-    color: #888;
-    font-family: 'Courier New', monospace;
-    line-height: 1.7;
-    background: #151515;
-    white-space: pre-wrap;
-  }
-}
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; }
+  0%, 100% { opacity: 0.5; text-shadow: 0 0 10rpx var(--accent-purple); }
   50% { opacity: 1; }
 }
 
@@ -353,7 +309,7 @@ page {
         
         .archetype-fill {
           height: 100%;
-          background: linear-gradient(90deg, #8a6dff, #6e00ff);
+          background: var(--primary-gradient);
           border-radius: 3rpx;
           transition: width 0.3s;
         }
@@ -413,7 +369,7 @@ page {
 
 // ===== 安全区域适配 =====
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .container {
+  .detail-scroll {
     padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
   }
 }

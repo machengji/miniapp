@@ -1,0 +1,335 @@
+/**
+ * Aletheia - Animation System
+ * 轻量级 CSS 动画库，使用 transform/opacity 优化性能
+ */
+
+// ===== 核心动画（使用 transform/opacity 优化性能）=====
+
+// 淡入动画
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 淡出动画
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// 从底部滑入
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 从顶部滑入
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 从右侧滑入
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 从左侧滑入
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 缩放进入
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 缩放弹跳
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 脉冲效果
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// 呼吸光晕（用于输入框聚焦）
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--border-accent);
+  }
+  50% {
+    box-shadow: 0 0 0 8rpx var(--border-accent);
+  }
+}
+
+// 旋转加载
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 骨架屏 shimmer 效果
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// 闪烁光标
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// 浮动效果
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10rpx);
+  }
+}
+
+// 波纹扩散效果
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+// 心跳效果
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  10%, 30% {
+    transform: scale(1.1);
+  }
+  20%, 40% {
+    transform: scale(1);
+  }
+}
+
+// ===== 动画工具类 =====
+
+// 淡入动画
+.anim-fade-in {
+  animation: fadeIn var(--duration-base) ease;
+}
+
+.anim-fade-in-fast {
+  animation: fadeIn var(--duration-fast) ease;
+}
+
+.anim-fade-in-slow {
+  animation: fadeIn var(--duration-slow) ease;
+}
+
+// 淡出动画
+.anim-fade-out {
+  animation: fadeOut var(--duration-base) ease;
+}
+
+// 滑入动画
+.anim-slide-up {
+  animation: slideUp var(--duration-base) var(--easing-smooth);
+}
+
+.anim-slide-down {
+  animation: slideDown var(--duration-base) var(--easing-smooth);
+}
+
+.anim-slide-left {
+  animation: slideInLeft var(--duration-base) var(--easing-smooth);
+}
+
+.anim-slide-right {
+  animation: slideInRight var(--duration-base) var(--easing-smooth);
+}
+
+// 缩放动画
+.anim-scale-in {
+  animation: scaleIn var(--duration-base) var(--easing-smooth);
+}
+
+.anim-bounce-in {
+  animation: bounceIn var(--duration-base) var(--easing-bounce);
+}
+
+// 脉冲动画
+.anim-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.anim-pulse-slow {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+// 呼吸动画
+.anim-glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+// 旋转动画
+.anim-spin {
+  animation: spin 1s linear infinite;
+}
+
+.anim-spin-slow {
+  animation: spin 1.5s linear infinite;
+}
+
+// 浮动动画
+.anim-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+// 心跳动画
+.anim-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+// ===== Stagger 延迟类（用于列表项逐个进入）=====
+
+@for $i from 1 through 10 {
+  .delay-#{$i} {
+    animation-delay: #{$i * 0.1}s;
+  }
+}
+
+// ===== 骨架屏效果 =====
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+  @extend .skeleton;
+  height: 20rpx;
+  width: 100%;
+  margin-bottom: 12rpx;
+}
+
+.skeleton-avatar {
+  @extend .skeleton;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  @extend .skeleton;
+  width: 100%;
+  height: 200rpx;
+}
+
+// ===== 悬停效果 =====
+
+.hover-lift {
+  transition: transform var(--duration-base) var(--easing-smooth),
+              box-shadow var(--duration-base) var(--easing-smooth);
+
+  &:active {
+    transform: translateY(-4rpx);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.hover-scale {
+  transition: transform var(--duration-base) var(--easing-smooth);
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.hover-brightness {
+  transition: filter var(--duration-fast);
+
+  &:active {
+    filter: brightness(1.2);
+  }
+}

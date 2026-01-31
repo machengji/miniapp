@@ -1,4 +1,4 @@
-<navigation-bar title="心灵报告" back="{{true}}" color="white" background="#121212"></navigation-bar>
+<navigation-bar title="心灵报告" back="{{true}}" color="white" background="#121212" bind:heightready="onNavBarHeightReady"></navigation-bar>
 
 <scroll-view class="report-container" scroll-y>
   <!-- 加载状态 -->
@@ -9,7 +9,7 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{!isLoading && totalDreams === 0}}">
-    <view class="empty-icon">📊</view>
+    <image class="empty-icon svg-icon" src="/images/icons/chart.svg" mode="aspectFit"></image>
     <text class="empty-title">还没有足够的数据</text>
     <text class="empty-subtitle">记录至少3个梦境后，就能生成你的心灵报告了</text>
     <view class="start-btn" bindtap="goToChat">开始记录</view>
@@ -109,6 +109,6 @@
 
 <!-- 分享按钮 -->
 <view class="share-btn" bindtap="shareReport" wx:if="{{totalDreams > 0}}">
-  <text class="share-icon">↗</text>
+  <image class="share-icon svg-icon" src="/images/icons/share.svg" mode="aspectFit" style="width: 32rpx; height: 32rpx; margin-right: 8rpx;"></image>
   <text class="share-text">分享报告</text>
 </view>

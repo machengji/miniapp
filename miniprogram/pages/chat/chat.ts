@@ -22,8 +22,10 @@ Page({
     // Dream Metadata
     isMetadataVisible: false,
     moodOptions: ['焦虑', '恐惧', '喜悦', '悲伤', '困惑', '平静', '愤怒', '羞耻'],
-    selectedMood: '',
+    selectedMood: '困惑',
     clarity: 3,
+    // 导航栏高度
+    navBarHeight: 0,
   },
 
   onLoad(options: any) {
@@ -115,9 +117,11 @@ Page({
   // Metadata Handlers
   toggleMetadata() {
     this.setData({ isMetadataVisible: !this.data.isMetadataVisible });
+    wx.vibrateShort({ type: 'light' });
   },
   selectMood(e: any) {
     this.setData({ selectedMood: e.currentTarget.dataset.mood });
+    wx.vibrateShort({ type: 'light' });
   },
   onClarityChange(e: any) {
     this.setData({ clarity: e.detail.value });
@@ -136,6 +140,51 @@ Page({
       return msg;
     });
     this.setData({ messages });
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  onLongPressMessage(e: any) {
+    const id = e.currentTarget.dataset.id;
+    const message = this.data.messages.find(msg => msg.id === id);
+    
+    if (!message || message.role === 'system' || message.id === 'system_welcome') {
+      return;
+    }
+    
+    wx.showActionSheet({
+      itemList: ['复制', '删除'],
+      success: (res: any) => {
+        if (res.tapIndex === 0) {
+          this.copyMessage(message.content);
+        } else if (res.tapIndex === 1) {
+          this.deleteMessage(id);
+        }
+      }
+    });
+  },
+
+  copyMessage(content: string) {
+    wx.setClipboardData({
+      data: content,
+      success: () => {
+        wx.showToast({ title: '已复制', icon: 'success', duration: 1500 });
+      }
+    });
+  },
+
+  deleteMessage(id: string) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这条消息吗？',
+      success: (res: any) => {
+        if (res.confirm) {
+          const messages = this.data.messages.filter(msg => msg.id !== id);
+          this.setData({ messages });
+          wx.vibrateShort({ type: 'medium' });
+          wx.showToast({ title: '已删除', icon: 'success', duration: 1500 });
+        }
+      }
+    });
   },
 
   addMessage(msg: Message) {
@@ -161,6 +210,11 @@ Page({
   async sendMessage() {
     const content = this.data.inputValue.trim();
     if (!content || this.data.isStreaming) return;
+
+;
+
+    // 触觉反馈
+    wx.vibrateShort({ type: 'light' });
 
     // Capture metadata at the moment of sending
     const currentMood = this.data.selectedMood;
@@ -362,6 +416,14 @@ Page({
         this.setData({ isStreaming: false, scrollTarget: 'bottom-anchor' });
         this.updateLastMessage({ isStreaming: false });
     }
+  },
+
+  /**
+   * 导航栏高度就绪回调
+   */
+  onNavBarHeightReady(e: any) {
+    const { totalHeight } = e.detail;
+    this.setData({ navBarHeight: totalHeight });
   },
 
   /**

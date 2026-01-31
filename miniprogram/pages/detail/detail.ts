@@ -23,7 +23,8 @@ Page({
     isThoughtExpanded: false,
     moodIcon: '',
     moodColor: '',
-    formattedDate: ''
+    formattedDate: '',
+    navBarHeight: 0,
   },
 
   onLoad(options: any) {
@@ -223,6 +224,14 @@ Page({
       console.error('删除失败:', err);
       wx.showToast({ title: '删除失败', icon: 'error' });
     }
+  },
+
+  /**
+   * 导航栏高度就绪回调
+   */
+  onNavBarHeightReady(e: any) {
+    const { totalHeight } = e.detail;
+    this.setData({ navBarHeight: totalHeight });
   },
 
   /**

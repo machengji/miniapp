@@ -1,3 +1,10 @@
+/**
+ * Aletheia - Global Styles
+ * 导入设计系统
+ */
+@import './styles/variables.scss';
+@import './styles/animations.scss';
+
 /**app.wxss**/
 .container {
   height: 100%;
@@ -7,4 +14,34 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}
+
+/* 通用 SVG 图标样式 */
+.svg-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* 特定组件图标覆盖 */
+.action-icon.svg-icon, 
+.map-icon.svg-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.empty-icon.svg-icon {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+.card-icon.svg-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.fab-icon-img {
+  width: 60rpx;
+  height: 60rpx;
+}

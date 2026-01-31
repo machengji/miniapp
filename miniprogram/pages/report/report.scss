@@ -5,8 +5,9 @@ page {
 }
 
 .report-container {
+  margin-top: 88px;
   padding: 40rpx;
-  padding-top: 120rpx;
+  padding-top: calc(40rpx + {{navBarHeight}}px);
   padding-bottom: 140rpx;
 }
 
@@ -21,8 +22,8 @@ page {
   .loading-spinner {
     width: 60rpx;
     height: 60rpx;
-    border: 4rpx solid #333;
-    border-top-color: #8a6dff;
+    border: 4rpx solid var(--border-secondary);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -63,11 +64,11 @@ page {
   
   .start-btn {
     padding: 24rpx 60rpx;
-    background: linear-gradient(135deg, #8a6dff, #6e00ff);
+    background: var(--primary-gradient);
     border-radius: 40rpx;
     color: #fff;
     font-size: 30rpx;
-    box-shadow: 0 10rpx 30rpx rgba(138, 109, 255, 0.3);
+    box-shadow: var(--shadow-primary);
     
     &:active {
       transform: scale(0.98);
@@ -85,11 +86,11 @@ page {
     
     .stat-card {
       flex: 1;
-      background: linear-gradient(135deg, rgba(138, 109, 255, 0.15), rgba(138, 109, 255, 0.05));
+      background: linear-gradient(135deg, rgba(201, 168, 108, 0.15), rgba(201, 168, 108, 0.05));
       border-radius: 20rpx;
       padding: 30rpx 20rpx;
       text-align: center;
-      border: 1px solid rgba(138, 109, 255, 0.2);
+      border: 1px solid rgba(201, 168, 108, 0.2);
       
       .stat-number {
         display: block;
@@ -174,7 +175,7 @@ page {
       
       .bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, #8a6dff 0%, #6e00ff 100%);
+        background: var(--primary-gradient);
         border-radius: 8rpx;
         transition: width 0.5s ease;
       }
@@ -198,17 +199,17 @@ page {
 }
 
 .insight-box {
-  background: rgba(138, 109, 255, 0.1);
-  border-left: 4rpx solid #8a6dff;
-  padding: 24rpx;
-  border-radius: 12rpx;
-  
-  .insight-text {
-    font-size: 28rpx;
-    color: #d0d0d0;
-    line-height: 1.6;
+    background: rgba(201, 168, 108, 0.1);
+    border-left: 4rpx solid var(--primary);
+    padding: 24rpx;
+    border-radius: 12rpx;
+    
+    .insight-text {
+      font-size: 28rpx;
+      color: #d0d0d0;
+      line-height: 1.6;
+    }
   }
-}
 
 // ===== 雷达图 =====
 .radar-container {
@@ -246,12 +247,12 @@ page {
       margin-bottom: 4rpx;
     }
     
-    .legend-value {
-      font-size: 24rpx;
-      font-weight: 600;
-      color: #8a6dff;
+      .legend-value {
+        font-size: 24rpx;
+        font-weight: 600;
+        color: var(--primary);
+      }
     }
-  }
 }
 
 // ===== 情绪分布 =====
@@ -277,7 +278,7 @@ page {
       
       .bar {
         height: 100%;
-        background: linear-gradient(90deg, #8a6dff, #6e00ff);
+        background: var(--primary-gradient);
         border-radius: 6rpx;
         transition: width 0.5s ease;
       }
@@ -300,11 +301,11 @@ page {
   
   .symbol-tag {
     padding: 16rpx 32rpx;
-    background: linear-gradient(135deg, rgba(138, 109, 255, 0.2), rgba(138, 109, 255, 0.1));
+    background: var(--primary-gradient);
     border-radius: 32rpx;
     font-size: 28rpx;
-    color: #8a6dff;
-    border: 1px solid rgba(138, 109, 255, 0.3);
+    color: var(--primary);
+    border: 1px solid rgba(201, 168, 108, 0.3);
   }
 }
 
@@ -316,9 +317,9 @@ page {
   display: flex;
   align-items: center;
   padding: 24rpx 40rpx;
-  background: linear-gradient(135deg, #8a6dff, #6e00ff);
+  background: var(--primary-gradient);
   border-radius: 50rpx;
-  box-shadow: 0 10rpx 30rpx rgba(138, 109, 255, 0.4);
+  box-shadow: var(--shadow-primary);
   z-index: 100;
   
   &:active {
@@ -345,6 +346,7 @@ page {
 // ===== 安全区域适配 =====
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .report-container {
+  margin-top: 88px;
     padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
   }
   

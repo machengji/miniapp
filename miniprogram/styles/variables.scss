@@ -1,0 +1,94 @@
+/**
+ * Aletheia - Color Design System
+ * 暖和柔和的心理学主题
+ */
+
+:root {
+  // ===== 主颜色系统 - 温暖柔和心理风 =====
+  --primary: #c9a86c;
+  --primary-light: #f4d03f;
+  --primary-dark: #8b7355;
+  --primary-gradient: linear-gradient(135deg, #f4d03f, #c9a86c, #8b7355);
+
+  // 辅色调 - 柔和蓝色
+  --secondary: #7b9acc;
+  --secondary-light: #9fb8d9;
+  --secondary-dark: #5a8bb3;
+  --secondary-gradient: linear-gradient(135deg, #9fb8d9, #7b9acc, #5a8bb3);
+
+  // 保留的紫色（用于思维链作为次要强调色）
+  --accent-purple: #8a6dff;
+  --accent-purple-light: #b99eff;
+  --accent-purple-dark: #6e00ff;
+
+  // ===== 颜色工具 =====
+  --success: #81C784;
+  --warning: #FFB74D;
+  --error: #E57373;
+  --info: #64B5F6;
+
+  // ===== 背景色 =====
+  --bg-primary: #121212;
+  --bg-secondary: #1a1814;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.05);
+  --bg-input: #3a3a3a;
+
+  // ===== 文字色 =====
+  --text-primary: #e0e0e0;
+  --text-secondary: #d0d0d0;
+  --text-tertiary: #888;
+  --text-quaternary: #666;
+
+  // ===== 边框色 =====
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-accent: rgba(201, 168, 108, 0.3);
+
+  // ===== 阴影 =====
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10rpx 40rpx rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20raterp rgba(201, 168, 108, 0.4);
+  --shadow-primary: 0 4rpx 12rpx rgba(201, 168, 108, 0.3);
+  --shadow-purple: 0 4rpx 12rpx rgba(138, 109, 255, 0.3);
+
+  // ===== 圆角 =====
+  --radius-xs: 8rpx;
+  --radius-sm: 12rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 20rpx;
+  --radius-xl: 24rpx;
+  --radius-pill: 40rpx;
+  --radius-round: 50%;
+
+  // ===== 间距 =====
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 40rpx;
+  --spacing-2xl: 48rpx;
+
+  // ===== 字体大小 =====
+  --font-xs: 20rpx;
+  --font-sm: 22rpx;
+  --font-base: 26rpx;
+  --font-md: 30rpx;
+  --font-lg: 36rpx;
+  --font-xl: 44rpx;
+;
+  --font-2xl: 56rpx;
+
+  // ===== 动画时长 =====
+  --duration-fast: 0.2s;
+  --duration-base: 0.3s;
+  --duration-slow: 0.6s;
+  --easing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --easing-smooth: cubic-bezier(0.19, 1, 0.22, 1);
+
+  // ===== z-index =====
+  --z-dropdown: 100;
+  --z-modal: 1000;
+  --z-overlay: 2000;
+}

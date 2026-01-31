@@ -1,8 +1,8 @@
-<navigation-bar title="Aletheia" back="{{false}}" color="white" background="#1a1a1a"></navigation-bar>
+<navigation-bar title="Aletheia" back="{{true}}" color="white" background="#1a1a1a" bind:heightready="onNavBarHeightReady"></navigation-bar>
 
-<scroll-view class="chat-container" scroll-y="true" scroll-into-view="{{scrollTarget}}" enable-flex="true" show-scrollbar="true">
+<scroll-view class="chat-container" scroll-y="true" scroll-into-view="{{scrollTarget}}" enable-flex="true" enhanced="{{true}}" show-scrollbar="{{false}}">
   <view class="intro-card" wx:if="{{messages.length === 0}}">
-    <view class="logo">A</view>
+    <image class="logo svg-icon" src="/images/icons/logo.svg" mode="aspectFit" style="width: 120rpx; height: 120rpx; margin-bottom: 20rpx;"></image>
     <view class="title">Project Aletheia</view>
     <view class="subtitle">我是你的深层心理观察者。</view>
     <view class="desc">我不预测未来，我只解读你的潜意识。请告诉我一个梦境，或者一件让你情绪波动的小事。</view>
@@ -10,7 +10,7 @@
 
   <block wx:for="{{messages}}" wx:key="id">
     <!-- User Message -->
-    <view class="message-group user" wx:if="{{item.role === 'user'}}">
+    <view class="message-group user" wx:if="{{item.role === 'user'}}" bindlongpress="onLongPressMessage" data-id="{{item.id}}">
       <view class="bubble user-bubble">
         <text user-select="true">{{item.content}}</text>
       </view>
@@ -18,17 +18,19 @@
 
     <!-- AI Message -->
     <view class="message-group ai" wx:if="{{item.role === 'assistant'}}">
-      <view class="avatar">A</view>
+      <view class="avatar">
+        <image src="/images/icons/logo.svg" mode="aspectFit" style="width: 60%; height: 60%;"></image>
+      </view>
       <view class="content-wrapper">
         
         <!-- Thinking/Reasoning Block (The "CoT" Visualization) -->
         <view class="thought-chain" wx:if="{{item.thought}}" bindtap="toggleThought" data-id="{{item.id}}">
           <view class="thought-header">
-            <view class="icon-brain">✦</view> 
+            <image class="icon-brain svg-icon" src="/images/icons/brain.svg" mode="aspectFit" style="width: 32rpx; height: 32rpx; margin-right: 8rpx;"></image> 
             <text>深度分析回路 (Deep Trace)</text>
-            <view class="toggle-icon {{item.isThoughtExpanded ? 'expanded' : ''}}">▼</view>
+            <image class="toggle-icon svg-icon {{item.isThoughtExpanded ? 'expanded' : ''}}" src="/images/icons/chevron-down.svg" mode="aspectFit" style="width: 24rpx; height: 24rpx; margin-left: auto;"></image>
           </view>
-          <view class="thought-content" wx:if="{{item.isThoughtExpanded}}">
+        <view class="thought-content" wx:if="{{item.isThoughtExpanded}}">
             <text user-select="true">{{item.thought}}</text>
           </view>
         </view>
@@ -50,19 +52,23 @@
 <view class="metadata-panel {{isMetadataVisible ? 'visible' : ''}}">
   <view class="panel-header">
     <text>梦境标记</text>
-    <view class="close-btn" bindtap="toggleMetadata">×</view>
+    <view class="close-btn" bindtap="toggleMetadata">
+      <image src="/images/icons/close.svg" mode="aspectFit" style="width: 100%; height: 100%;"></image>
+    </view>
   </view>
   
   <view class="section-title">情绪基调</view>
-  <scroll-view class="tags-scroll" scroll-x="true" enable-flex="true">
-    <view 
-      class="tag {{selectedMood === item ? 'selected' : ''}}" 
-      wx:for="{{moodOptions}}" 
-      wx:key="*this"
-      bindtap="selectMood"
-      data-mood="{{item}}"
-    >
-      {{item}}
+  <scroll-view class="tags-scroll" scroll-x="true" show-scrollbar="{{false}}">
+    <view style="display: inline-block; white-space: nowrap; padding: 8rpx 0;">
+      <view 
+        class="tag {{selectedMood === item ? 'selected' : ''}}" 
+        wx:for="{{moodOptions}}" 
+        wx:key="*this"
+        bindtap="selectMood"
+        data-mood="{{item}}"
+      >
+        {{item}}
+      </view>
     </view>
   </scroll-view>
 
@@ -79,20 +85,35 @@
 
 <view class="input-area">
   <view class="meta-toggle-btn {{isMetadataVisible ? 'active' : ''}}" bindtap="toggleMetadata">
-    ⚙
+    <image src="/images/icons/settings.svg" mode="aspectFit"></image>
   </view>
-  <input 
-    class="chat-input" 
-    type="text" 
-    confirm-type="send" 
-    placeholder="输入梦境、困惑或记忆..." 
-    placeholder-class="input-placeholder"
-    value="{{inputValue}}"
-    bindinput="onInput"
-    bindconfirm="sendMessage"
-    disabled="{{isStreaming}}"
-  />
+  <view class="input-wrapper">
+    <scroll-view class="mood-tags-scroll" scroll-x="true" show-scrollbar="{{false}}">
+      <view style="display: inline-block; white-space: nowrap;">
+        <view
+          class="mood-tag {{selectedMood === item ? 'selected' : ''}}"
+          wx:for="{{moodOptions}}"
+          wx:key="*this"
+          bindtap="selectMood"
+          data-mood="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+    <input
+      class="chat-input"
+      type="text"
+      confirm-type="send"
+      placeholder="输入梦境、困惑或记忆..."
+      placeholder-class="input-placeholder"
+      value="{{inputValue}}"
+      bindinput="onInput"
+      bindconfirm="sendMessage"
+      disabled="{{isStreaming}}"
+    />
+  </view>
   <view class="send-btn {{inputValue.length > 0 ? 'active' : ''}}" bindtap="sendMessage">
-    ↑
+    <image src="/images/icons/send.svg" mode="aspectFit"></image>
   </view>
 </view>

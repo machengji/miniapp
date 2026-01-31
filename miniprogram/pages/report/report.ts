@@ -5,13 +5,13 @@ Page({
     // Persona/Shadow 平衡
     personaPercentage: 50,
     polarityInsight: "你的心灵处于动态平衡中。",
-    
+
     // 基础统计
     totalDreams: 0,
     avgClarity: "0.0",
     dominantMood: "-",
     streakDays: 0,
-    
+
     // 荣格 12 原型 (用于雷达图)
     archetypes: [
       { name: '天真者', value: 0, icon: '👶' },
@@ -27,15 +27,18 @@ Page({
       { name: '魔术师', value: 0, icon: '🔮' },
       { name: '统治者', value: 0, icon: '👑' }
     ],
-    
+
     // 情绪分布
-    moodDistribution: [] as {mood: string, count: number, percentage: number}[],
-    
+    moodDistribution: [] as {mood: string, count: number, percentage: number}[]
+
     // 反复出现的意象
-    recurrentSymbols: [] as string[],
-    
+    recurrentSymbols: [] as string[]
+
     // 加载状态
-    isLoading: true
+    isLoading: true,
+
+    // 导航栏高度
+    navBarHeight: 0,
   },
 
   onShow() {
@@ -208,19 +211,22 @@ Page({
   },
 
   /**
-   * 绘制雷达图
+   * 绘制雷达图 - 添加动画
    */
   drawRadar(data: any[]) {
     const query = wx.createSelectorQuery();
     query.select('#radarCanvas')
-      .fields({ node: true, size: true })
-      .exec((res) => {
+      .fields({ node: true, size:rect true })
+      .exec((res: any) => {
         if (!res[0]) return;
         
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
 
         const dpr = wx.getSystemInfoSync().pixelRatio;
+       
+        
+        // 设置 Canvas 尺寸
         canvas.width = res[0].width * dpr;
         canvas.height = res[0].height * dpr;
         ctx.scale(dpr, dpr);
@@ -236,12 +242,129 @@ Page({
         // 绘制背景网格
         this.drawRadarGrid(ctx, centerX, centerY, radius);
 
-        // 绘制数据
-        this.drawRadarData(ctx, centerX, centerY, radius, data);
+        // 动画绘制数据
+        this.animateRadarDrawing(ctx, centerX, centerY, radius, data);
 
-        // 绘制标签
-        this.drawRadarLabels(ctx, centerX, centerY, radius, data);
+        // 动画绘制标签
+        setTimeout(() => {
+          this.animateRadarLabels(ctx, centerX, centerY, radius, data);
+        }, 300);
       });
+  },
+
+  /**
+   * 动画绘制雷达数据
+   */
+  animateRadarDrawing(ctx: any, centerX: number, centerY: number, radius: number, data: any[]) {
+    const sides = data.length;
+    const angleStep = (Math.PI * 2) / sides;
+    
+    // 逐个点进行动画
+    data.forEach((item: any, index: number) => {
+      setTimeout(() => {
+        this.drawRadarPolygon(ctx, centerX, centerY, radius, data.slice(0, index + 1));
+        
+        // 绘制当前点的标签
+        this.drawRadarLabel(ctx, centerX, centerY, radius, item, index);
+      }, index * 100); // 每个点延迟 100ms
+    });
+  },
+
+  drawRadarPolygon(ctx: any, centerX: number, centerY: number, radius: number, data: any[]) {
+    const sides = data.length;
+    const angleStep = (Math.PI * 2) / sides;
+
+    // 绘制填充区域
+    ctx.beginPath();
+    data.forEach((item: any, index: number) => {
+      const angle = index * angleStep - Math.PI / 2;
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(201, 168, 108, 0.2)';
+    ctx.fill();
+
+    // 绘制数据线
+    ctx.beginPath();
+    data.forEach((item: any, index: number) => {
+      const angle = index * angleStep - Math.PI / 2;
+      const value = item.value || 0;
+      const r = (value / 100) * radius;
+      
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.closePath();
+    ctx.strokeStyle = '#c9a86c';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // 绘制数据点
+    data.forEach((item: any, index: number) => {
+      const angle = index * angleStep - Math.PI / 2;
+      const value = item.value || 0;
+      const r = (value / 100) * radius;
+      
+      const x = centerX + Math.cos(angle) * r;
+      const y = centerY + Math.sin(angle) * r;
+      
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#c9a86c';
+      ctx.fill();
+      
+      // 绘制图标
+      ctx.fillStyle = '#fff';
+      ctx.font = '14px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.icon, x, y - 2);
+    });
+  },
+
+  drawRadarLabel(ctx: any, centerX: number, centerY: number, radius: number, item: any, index: number) {
+    const sides = 12;
+    const angleStep = (Math.PI * 2) / sides;
+    const angle = index * angleStep - Math.PI / 2;
+    const value = item.value || 0;
+    const r = (value / 100) * radius + 20;
+    
+    const x = centerX + Math.cos(angle) * r;
+    const y = centerY + Math.sin(angle) * r;
+    
+    ctx.fillStyle = '#888';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(item.name, x, y);
+  },
+
+  animateRadarLabels(ctx: any, centerX:ari: number, centerY: number, radius: number, data: any[]) {
+    const sides = data.length;
+    const angleStep = (Math.PI * 2) / sides;
+    
+    data.forEach((item: any, index: number) => {
+      setTimeout(() => {
+        this.drawRadarLabel(ctx, centerX, centerY, radius, item, index);
+      }, index * 80);
+    });
   },
 
   /**
@@ -348,6 +471,14 @@ Page({
       ctx.fillStyle = '#888';
       ctx.fillText(item.name, x, y + 8);
     });
+  },
+
+  /**
+   * 导航栏高度就绪回调
+   */
+  onNavBarHeightReady(e: any) {
+    const { totalHeight } = e.detail;
+    this.setData({ navBarHeight: totalHeight });
   },
 
   /**

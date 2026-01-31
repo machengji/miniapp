@@ -1,7 +1,16 @@
-<!-- 首页：梦境日记 + 对话历史 + 用户统计 -->
-<navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212"></navigation-bar>
+ <!-- 首页：梦境日记 + 对话历史 + 用户统计 -->
+<navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212" bind:heightready="onNavBarHeightReady"></navigation-bar>
 
-<scroll-view class="journal-list" scroll-y type="list" refresher-enabled="{{true}}" refresher-triggered="{{isLoading}}" bindrefresherrefresh="onPullDownRefresh">
+<!-- 全屏加载动画 -->
+<view class="loading-mask {{isLoading ? 'visible' : ''}}">
+  <view class="loading-content">
+    <image class="loading-logo" src="/images/icons/logo.svg" mode="aspectFit"></image>
+    <view class="loading-ripple"></view>
+    <text class="loading-text">正在连接潜意识...</text>
+  </view>
+</view>
+
+<scroll-view class="journal-list" scroll-y="true" type="list" enhanced="{{true}}" show-scrollbar="{{false}}">
   
   <!-- 头部区域 -->
   <view class="header">
@@ -12,11 +21,11 @@
       </view>
       <view class="header-actions">
         <view class="daily-card-btn" bindtap="showDailyCard">
-          <text class="action-icon">🎴</text>
-          <text class="action-badge" wx:if="{{!hasDrawnCard}}">1</text>
+          <image class="action-icon svg-icon" src="/images/icons/daily-card.svg" mode="aspectFit"></image>
+          <view class="action-badge" wx:if="{{!hasDrawnCard}}"></view>
         </view>
         <view class="map-btn" bindtap="goToReport">
-          <text class="map-icon">🔮</text>
+          <image class="map-icon svg-icon" src="/images/icons/analysis.svg" mode="aspectFit"></image>
         </view>
       </view>
     </view>
@@ -54,7 +63,7 @@
   <!-- 对话历史卡片列表 -->
   <view class="conversation-card" wx:for="{{conversations}}" wx:key="_id" bindtap="continueConversation" data-id="{{item._id}}" bindlongpress="deleteConversation">
     <view class="card-left">
-      <view class="card-icon">💬</view>
+      <image class="card-icon svg-icon" src="/images/icons/chat.svg" mode="aspectFit"></image>
       <view class="card-status" wx:if="{{item.messageCount > 0}}">
         <text class="status-dot"></text>
       </view>
@@ -107,7 +116,7 @@
   
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{dreams.length === 0 && !isLoading}}">
-    <view class="empty-icon">🌙</view>
+    <image class="empty-icon svg-icon" src="/images/icons/empty-state.svg" mode="aspectFit"></image>
     <text class="empty-title">尚未记录任何梦境</text>
     <text class="empty-subtitle">点击右下角按钮，开启你的潜意识探索之旅</text>
   </view>
@@ -118,7 +127,10 @@
 
 <!-- 悬浮按钮 -->
 <view class="fab" bindtap="goToChat">
-  <text class="fab-icon">+</text>
+  <view class="fab-icon">
+    <!-- 笔形图标 -->
+    <image class="fab-icon-img" src="/images/icons/create.svg" mode="aspectFit"></image>
+  </view>
 </view>
 
 <!-- 每日卡片 -->

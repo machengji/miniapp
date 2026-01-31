@@ -2,13 +2,13 @@
   "pages": [
     "pages/index/index",
     "pages/chat/chat",
-    "pages/detail/detail",
-    "pages/logs/logs"
+    "pages/detail/detail"
   ],
   "window": {
     "navigationBarTextStyle": "white",
     "navigationStyle": "custom",
-    "backgroundColor": "#121212"
+    "backgroundColor": "#121212",
+    "disableScroll": true
   },
   "style": "v2",
   "renderer": "webview",
