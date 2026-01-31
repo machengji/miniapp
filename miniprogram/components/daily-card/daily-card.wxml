@@ -1,0 +1,51 @@
+<!-- 每日共时性卡片组件 -->
+<view class="card-overlay {{visible ? 'visible' : ''}}" bindtap="closeCard">
+  <view class="card-container {{isFlipped ? 'flipped' : ''}}" bindtap="stopPropagation">
+    
+    <!-- 卡片正面（未翻开） -->
+    <view class="card-face card-front" wx:if="{{!hasDrawn}}">
+      <view class="card-pattern"></view>
+      <view class="card-content">
+        <view class="card-icon">🎴</view>
+        <view class="card-title">每日共时性卡片</view>
+        <view class="card-desc">抽取一张来自潜意识的指引</view>
+        <view class="draw-btn {{isDrawing ? 'drawing' : ''}}" bindtap="drawCard">
+          <text wx:if="{{!isDrawing}}">抽取卡片</text>
+          <text wx:else>抽取中...</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 卡片背面（已翻开） -->
+    <view class="card-face card-back" wx:if="{{todayCard}}">
+      <view class="card-header" style="background: {{todayCard.color}}20; border-color: {{todayCard.color}}40;">
+        <view class="card-type-icon" style="background: {{todayCard.color}}">{{todayCard.icon}}</view>
+        <view class="card-meta">
+          <text class="card-type">{{todayCard.typeName}}卡</text>
+          <text class="card-date">{{todayCard.date}}</text>
+        </view>
+      </view>
+      
+      <view class="card-body">
+        <view class="card-title">{{todayCard.title}}</view>
+        <view class="card-message">{{todayCard.content}}</view>
+        <view class="card-advice">
+          <view class="advice-label">今日指引</view>
+          <view class="advice-text">{{todayCard.advice}}</view>
+        </view>
+      </view>
+      
+      <view class="card-footer">
+        <view class="action-btn share" bindtap="shareCard">
+          <text class="btn-icon">↗</text>
+          <text>分享</text>
+        </view>
+        <view class="action-btn close" bindtap="closeCard">
+          <text class="btn-icon">✓</text>
+          <text>收下</text>
+        </view>
+      </view>
+    </view>
+    
+  </view>
+</view>

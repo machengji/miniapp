@@ -42,7 +42,11 @@ Page({
     isLoading: true,
     
     // 用户信息
-    userInfo: null as WechatMiniprogram.UserInfo | null
+    userInfo: null as WechatMiniprogram.UserInfo | null,
+    
+    // 每日卡片
+    showDailyCard: false,
+    hasDrawnCard: false
   },
 
   onLoad() {
@@ -54,6 +58,45 @@ Page({
         this.setData({ userInfo });
       };
     }
+    
+    // 检查今天是否已抽卡
+    this.checkDailyCard();
+  },
+  
+  /**
+   * 检查今日卡片状态
+   */
+  checkDailyCard() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastDraw = wx.getStorageSync('lastDrawDate');
+    this.setData({ hasDrawnCard: lastDraw === today });
+  },
+  
+  /**
+   * 显示每日卡片
+   */
+  showDailyCard() {
+    this.setData({ showDailyCard: true });
+  },
+  
+  /**
+   * 隐藏每日卡片
+   */
+  hideDailyCard() {
+    this.setData({ showDailyCard: false });
+    this.checkDailyCard(); // 更新红点状态
+  },
+  
+  /**
+   * 分享卡片
+   */
+  onShareCard(e: any) {
+    const card = e.detail.card;
+    // 可以在这里实现分享逻辑
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage']
+    });
   },
 
   onShow() {

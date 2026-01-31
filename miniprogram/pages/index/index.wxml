@@ -10,8 +10,14 @@
         <text class="title">梦境日志</text>
         <text class="subtitle">记录无意识的低语</text>
       </view>
-      <view class="map-btn" bindtap="goToReport">
-        <text class="map-icon">🔮</text>
+      <view class="header-actions">
+        <view class="daily-card-btn" bindtap="showDailyCard">
+          <text class="action-icon">🎴</text>
+          <text class="action-badge" wx:if="{{!hasDrawnCard}}">1</text>
+        </view>
+        <view class="map-btn" bindtap="goToReport">
+          <text class="map-icon">🔮</text>
+        </view>
       </view>
     </view>
     
@@ -87,3 +93,6 @@
 <view class="fab" bindtap="goToChat">
   <text class="fab-icon">+</text>
 </view>
+
+<!-- 每日卡片 -->
+<daily-card visible="{{showDailyCard}}" bind:close="hideDailyCard" bind:share="onShareCard" />

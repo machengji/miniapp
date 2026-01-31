@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "navigation-bar": "/components/navigation-bar/navigation-bar"
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "daily-card": "/components/daily-card/daily-card"
   },
   "enablePullDownRefresh": true,
   "backgroundColor": "#121212"
