@@ -1,5 +1,12 @@
 <!-- 梦境详情页 -->
-<navigation-bar title="梦境详情" back="{{true}}" color="white" background="#121212" bindback="goBack"></navigation-bar>
+<view class="nav-bar">
+  <view class="nav-back" bindtap="goBack">
+    <text class="back-icon">←</text>
+    <text class="back-text">返回</text>
+  </view>
+  <text class="nav-title">梦境详情</text>
+  <view class="nav-placeholder"></view>
+</view>
 
 <view class="container">
   <!-- 加载状态 -->
@@ -23,7 +30,7 @@
 
     <!-- 标题 -->
     <view class="title-section">
-      <text class="dream-title">{{dream.summary || '无题梦境'}}</text>
+      <text class="dream-title">{{dream.summary}}</text>
     </view>
 
     <!-- 元数据 -->

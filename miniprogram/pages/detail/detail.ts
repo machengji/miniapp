@@ -61,6 +61,25 @@ Page({
         content = analysis.replace(/<think>[\s\S]*?<\/think>/, '').trim();
       }
 
+      // 智能生成标题
+      let displayTitle = '';
+      if (data.summary && data.summary.trim() && data.summary !== '无题梦境' && data.summary !== '梦境记录') {
+        // 优先使用AI生成的摘要
+        displayTitle = data.summary;
+      } else if (data.keywords && data.keywords.length > 0) {
+        // 使用关键词组合作为标题
+        displayTitle = data.keywords.slice(0, 3).join(' · ');
+      } else {
+        // 从内容中提取前15个字符作为标题
+        const dreamContent = data.content || '';
+        displayTitle = dreamContent.substring(0, 15) + (dreamContent.length > 15 ? '...' : '');
+      }
+      
+      // 如果标题还是空的，使用默认标题
+      if (!displayTitle || displayTitle.trim() === '') {
+        displayTitle = '梦境片段';
+      }
+
       // 格式化日期
       const date = new Date(data.createTime);
       const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -68,6 +87,7 @@ Page({
       this.setData({
         dream: {
           ...data,
+          summary: displayTitle, // 使用智能生成的标题
           thought,
           content
         },

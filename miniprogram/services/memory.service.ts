@@ -18,9 +18,15 @@ export interface MemoryContext {
 }
 
 class MemoryService {
-  private readonly MAX_MEMORY_ITEMS = 5;
-  private readonly MAX_CONTENT_LENGTH = 200;
-  private readonly SIMILARITY_THRESHOLD = 0.3;
+  private MAX_MEMORY_ITEMS: number;
+  private MAX_CONTENT_LENGTH: number;
+  private SIMILARITY_THRESHOLD: number;
+
+  constructor() {
+    this.MAX_MEMORY_ITEMS = 5;
+    this.MAX_CONTENT_LENGTH = 200;
+    this.SIMILARITY_THRESHOLD = 0.3;
+  }
 
   /**
    * 加载用户的长期记忆

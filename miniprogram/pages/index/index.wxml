@@ -1,4 +1,4 @@
-<!-- 首页：梦境日记 + 用户统计 -->
+<!-- 首页：梦境日记 + 对话历史 + 用户统计 -->
 <navigation-bar title="Aletheia" back="{{false}}" color="white" background="#121212"></navigation-bar>
 
 <scroll-view class="journal-list" scroll-y type="list" refresher-enabled="{{true}}" refresher-triggered="{{isLoading}}" bindrefresherrefresh="onPullDownRefresh">
@@ -45,9 +45,36 @@
     </view>
   </view>
 
+  <!-- 对话历史区域 -->
+  <view class="section-header" wx:if="{{conversations.length > 0}}">
+    <text class="section-title">对话历史</text>
+    <text class="section-count">共 {{conversations.length}} 条</text>
+  </view>
+
+  <!-- 对话历史卡片列表 -->
+  <view class="conversation-card" wx:for="{{conversations}}" wx:key="_id" bindtap="continueConversation" data-id="{{item._id}}" bindlongpress="deleteConversation">
+    <view class="card-left">
+      <view class="card-icon">💬</view>
+      <view class="card-status" wx:if="{{item.messageCount > 0}}">
+        <text class="status-dot"></text>
+      </view>
+    </view>
+    <view class="card-content">
+      <view class="card-header">
+        <text class="card-title">{{item.title || '未命名对话'}}</text>
+        <text class="card-time">{{item.formattedTime}}</text>
+      </view>
+      <text class="card-preview">{{item.preview || '暂无消息'}}</text>
+      <view class="card-meta">
+        <text class="meta-tag" wx:if="{{item.messageCount > 0}}">{{item.messageCount}} 条消息</text>
+        <text class="meta-tag mood-tag" wx:if="{{item.mood}}" style="background: {{item.moodColor}}20; color: {{item.moodColor}}">{{item.mood}}</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 最近记录标题 -->
   <view class="section-header" wx:if="{{dreams.length > 0}}">
-    <text class="section-title">最近记录</text>
+    <text class="section-title">梦境记录</text>
     <text class="section-count">共 {{stats.totalDreams}} 条</text>
   </view>
 

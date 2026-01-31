@@ -138,7 +138,119 @@ page {
   }
 }
 
-// ===== 分区标题 =====
+// ===== 对话历史卡片 =====
+.conversation-card {
+  display: flex;
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.1s ease, background 0.2s;
+  position: relative;
+  overflow: hidden;
+  
+  &:active {
+    transform: scale(0.98);
+    background: rgba(30, 30, 30, 1);
+  }
+  
+  // 左侧图标区域
+  .card-left {
+    position: relative;
+    margin-right: 24rpx;
+    
+    .card-icon {
+      width: 80rpx;
+      height: 80rpx;
+      background: linear-gradient(135deg, #8a6dff, #6e00ff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40rpx;
+      box-shadow: 0 4rpx 16rpx rgba(138, 109, 255, 0.3);
+    }
+    
+    .card-status {
+      position: absolute;
+      bottom: -4rpx;
+      right: -4rpx;
+      
+      .status-dot {
+        display: block;
+        width: 20rpx;
+        height: 20rpx;
+        background: #4CAF50;
+        border-radius: 50%;
+        border: 3rpx solid #1a1a1a;
+      }
+    }
+  }
+  
+  // 内容区域
+  .card-content {
+    flex: 1;
+    min-width: 0;
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12rpx;
+      
+      .card-title {
+        font-size: 30rpx;
+        font-weight: 600;
+        color: #f0f0f0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 16rpx;
+      }
+      
+      .card-time {
+        font-size: 22rpx;
+        color: #666;
+        flex-shrink: 0;
+      }
+    }
+    
+    .card-preview {
+      font-size: 26rpx;
+      color: #888;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      margin-bottom: 16rpx;
+    }
+    
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12rpx;
+      
+      .meta-tag {
+        font-size: 20rpx;
+        padding: 4rpx 12rpx;
+        border-radius: 8rpx;
+        background: rgba(138, 109, 255, 0.1);
+        color: #8a6dff;
+        border: 1px solid rgba(138, 109, 255, 0.2);
+      }
+      
+      .mood-tag {
+        background: rgba(255, 183, 77, 0.1);
+        color: #FFB74D;
+        border-color: rgba(255, 183, 77, 0.2);
+      }
+    }
+  }
+}
 .section-header {
   display: flex;
   justify-content: space-between;

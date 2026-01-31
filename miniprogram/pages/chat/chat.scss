@@ -12,7 +12,28 @@ page {
   padding: 20rpx;
   box-sizing: border-box;
   padding-bottom: 40rpx;
-  padding-top: 100px;
+  padding-top: 20rpx;
+}
+
+// 滚动条样式
+scroll-view {
+  &::-webkit-scrollbar {
+    width: 8rpx;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 4rpx;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4rpx;
+
+    &:hover {
+      background: #555;
+    }
+  }
 }
 
 .intro-card {

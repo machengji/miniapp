@@ -1,6 +1,6 @@
 <navigation-bar title="Aletheia" back="{{false}}" color="white" background="#1a1a1a"></navigation-bar>
 
-<scroll-view class="chat-container" scroll-y="true" scroll-into-view="{{scrollTarget}}" enable-flex="true">
+<scroll-view class="chat-container" scroll-y="true" scroll-into-view="{{scrollTarget}}" enable-flex="true" show-scrollbar="true">
   <view class="intro-card" wx:if="{{messages.length === 0}}">
     <view class="logo">A</view>
     <view class="title">Project Aletheia</view>

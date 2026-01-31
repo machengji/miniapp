@@ -50,3 +50,6 @@ build/
 
 # Optional eslint cache
 .eslintcache
+
+# System anomalies
+nul

@@ -1,4 +1,6 @@
 // index.ts - 首页：梦境日记 + 用户统计
+import { conversationService, Conversation } from '../../services/conversation.service';
+
 const app = getApp<IAppOption>()
 
 interface Dream {
@@ -37,6 +39,9 @@ Page({
     
     // 梦境列表
     dreams: [] as Dream[],
+    
+    // 对话历史列表
+    conversations: [] as Conversation[],
     
     // 加载状态
     isLoading: true,
@@ -100,26 +105,28 @@ Page({
   },
 
   onShow() {
-    // 检查是否需要刷新
-    if (app.globalData.refreshDreamList) {
+    // 只在全局标记为需要刷新时才加载数据
+    if (app.globalData && app.globalData.refreshDreamList) {
       this.loadData();
       app.globalData.refreshDreamList = false;
-    } else {
-      this.loadData();
     }
+    // 否则不自动刷新，保持页面状态
   },
 
   /**
-   * 加载所有数据（用户统计 + 梦境列表）
+   * 加载所有数据（用户统计 + 梦境列表 + 对话历史）
    */
   async loadData() {
     this.setData({ isLoading: true });
     
     try {
-      // 先加载梦境列表（核心功能）
-      const dreamsRes = await this.loadDreams();
+      // 并行加载所有数据
+      const [dreamsRes, conversationsRes] = await Promise.all([
+        this.loadDreams(),
+        this.loadConversations()
+      ]);
       
-      // 再加载用户统计（非核心，失败不影响）
+      // 加载用户统计
       let statsRes = {
         totalDreams: dreamsRes.length,
         recentDreams: 0,
@@ -138,12 +145,55 @@ Page({
       this.setData({
         stats: statsRes,
         dreams: dreamsRes,
+        conversations: conversationsRes,
         isLoading: false
       });
     } catch (err) {
       console.error('加载数据失败:', err);
       this.setData({ isLoading: false });
       wx.showToast({ title: '加载失败', icon: 'error' });
+    }
+  },
+
+  /**
+   * 加载对话历史
+   */
+  async loadConversations(): Promise<Conversation[]> {
+    try {
+      const conversations = await conversationService.getConversations(20);
+      
+      // 格式化时间
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      return conversations.map(conv => {
+        const convTime = new Date(conv.lastMessageTime || conv.createTime);
+        const diffDays = Math.floor((today.getTime() - new Date(convTime.getFullYear(), convTime.getMonth(), convTime.getDate()).getTime()) / (1000 * 60 * 60 * 24));
+        
+        let formattedTime: string;
+        if (diffDays === 0) {
+          // 今天，显示时间
+          formattedTime = `${String(convTime.getHours()).padStart(2, '0')}:${String(convTime.getMinutes()).padStart(2, '0')}`;
+        } else if (diffDays === 1) {
+          formattedTime = '昨天';
+        } else if (diffDays < 7) {
+          formattedTime = `${diffDays}天前`;
+        } else {
+          formattedTime = `${convTime.getMonth() + 1}/${convTime.getDate()}`;
+        }
+        
+        // 获取情绪颜色
+        const moodColor = this.getMoodColor(conv.mood || 'unknown');
+        
+        return {
+          ...conv,
+          formattedTime,
+          moodColor
+        };
+      });
+    } catch (err) {
+      console.error('加载对话历史失败:', err);
+      return [];
     }
   },
 
@@ -181,12 +231,32 @@ Page({
           
           const dreams = res.data.map((d: any) => {
             const date = new Date(d.createTime);
+            
+            // 智能生成标题
+            let displayTitle = '';
+            if (d.summary && d.summary.trim() && d.summary !== '无题梦境' && d.summary !== '梦境记录') {
+              // 优先使用AI生成的摘要
+              displayTitle = d.summary;
+            } else if (d.keywords && d.keywords.length > 0) {
+              // 使用关键词组合作为标题
+              displayTitle = d.keywords.slice(0, 3).join(' · ');
+            } else {
+              // 从内容中提取前15个字符作为标题
+              const content = d.content || '';
+              displayTitle = content.substring(0, 15) + (content.length > 15 ? '...' : '');
+            }
+            
+            // 如果标题还是空的，使用默认标题
+            if (!displayTitle || displayTitle.trim() === '') {
+              displayTitle = '梦境片段';
+            }
+            
             return {
               ...d,
               day: date.getDate(),
               month: (date.getMonth() + 1) + '月',
-              // 显示AI生成的标题，如果没有则显示内容摘要
-              displayTitle: d.summary || (d.content.length > 20 ? d.content.substring(0, 20) + '...' : d.content),
+              // 使用智能生成的标题
+              displayTitle: displayTitle,
               // 情绪图标映射
               moodIcon: this.getMoodIcon(d.mood),
               // 情绪颜色
@@ -252,10 +322,60 @@ Page({
   },
 
   /**
-   * 跳转到聊天页
+   * 跳转到聊天页（新建对话）
    */
   goToChat() {
     wx.navigateTo({ url: '../chat/chat' });
+  },
+
+  /**
+   * 继续历史对话
+   */
+  continueConversation(e: any) {
+    const conversationId = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `../chat/chat?conversationId=${conversationId}`
+    });
+  },
+
+  /**
+   * 删除对话
+   */
+  deleteConversation(e: any) {
+    const conversationId = e.currentTarget.dataset.id;
+    
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后无法恢复，是否继续？',
+      confirmColor: '#E57373',
+      success: (res) => {
+        if (res.confirm) {
+          this.doDeleteConversation(conversationId);
+        }
+      }
+    });
+  },
+
+  /**
+   * 执行删除对话
+   */
+  async doDeleteConversation(conversationId: string) {
+    wx.showLoading({ title: '删除中...' });
+    
+    try {
+      await conversationService.deleteConversation(conversationId);
+      
+      // 从列表中移除
+      const conversations = this.data.conversations.filter(c => c._id !== conversationId);
+      this.setData({ conversations });
+      
+      wx.hideLoading();
+      wx.showToast({ title: '已删除', icon: 'success' });
+    } catch (err) {
+      wx.hideLoading();
+      console.error('删除对话失败:', err);
+      wx.showToast({ title: '删除失败', icon: 'error' });
+    }
   },
 
   /**

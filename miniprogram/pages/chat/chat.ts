@@ -1,4 +1,5 @@
 import { memoryService, MemoryContext } from '../../services/memory.service';
+import { conversationService, ChatMessage } from '../../services/conversation.service';
 
 interface Message {
   id: string;
@@ -15,6 +16,9 @@ Page({
     inputValue: '',
     scrollTarget: '',
     isStreaming: false,
+    // 对话相关
+    conversationId: '',
+    isNewConversation: true,
     // Dream Metadata
     isMetadataVisible: false,
     moodOptions: ['焦虑', '恐惧', '喜悦', '悲伤', '困惑', '平静', '愤怒', '羞耻'],
@@ -22,15 +26,90 @@ Page({
     clarity: 3,
   },
 
-  onLoad() {
-    this.addMessage({
-      id: 'system_welcome',
-      role: 'assistant',
-      content: '我是 Aletheia。请告诉我，此刻你心中正压抑着什么？',
-      thought: '初始化荣格心理模型...\n校准潜意识参数...',
-      isThoughtExpanded: false,
-      isStreaming: false
-    });
+  onLoad(options: any) {
+    if (options.conversationId) {
+      // 继续历史对话
+      this.setData({ 
+        conversationId: options.conversationId,
+        isNewConversation: false 
+      });
+      this.loadConversation(options.conversationId);
+    } else {
+      // 新建对话
+      this.setData({ isNewConversation: true });
+      this.addMessage({
+        id: 'system_welcome',
+        role: 'assistant',
+        content: '我是 Aletheia。请告诉我，此刻你心中正压抑着什么？',
+        thought: '初始化荣格心理模型...\n校准潜意识参数...',
+        isThoughtExpanded: false,
+        isStreaming: false
+      });
+    }
+  },
+
+  /**
+   * 加载历史对话
+   */
+  async loadConversation(conversationId: string) {
+    wx.showLoading({ title: '加载中...' });
+    
+    try {
+      // 加载对话信息
+      const conversation = await conversationService.getConversation(conversationId);
+      if (!conversation) {
+        throw new Error('对话不存在');
+      }
+      
+      // 加载消息列表
+      const messages = await conversationService.getMessages(conversationId);
+      
+      // 转换消息格式
+      const formattedMessages: Message[] = messages.map((msg: ChatMessage) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        thought: msg.thought,
+        isThoughtExpanded: msg.isThoughtExpanded || false,
+        isStreaming: false
+      }));
+      
+      // 如果没有消息，添加欢迎消息
+      if (formattedMessages.length === 0) {
+        formattedMessages.push({
+          id: 'system_welcome',
+          role: 'assistant',
+          content: '我是 Aletheia。请告诉我，此刻你心中正压抑着什么？',
+          thought: '初始化荣格心理模型...\n校准潜意识参数...',
+          isThoughtExpanded: false,
+          isStreaming: false
+        });
+      }
+      
+      this.setData({
+        messages: formattedMessages,
+        selectedMood: conversation.mood || '',
+        clarity: conversation.clarity || 3
+      });
+      
+      // 滚动到底部
+      this.scrollToBottom();
+      
+    } catch (err) {
+      console.error('加载对话失败:', err);
+      wx.showToast({ title: '加载失败', icon: 'error' });
+      // 加载失败时显示欢迎消息
+      this.addMessage({
+        id: 'system_welcome',
+        role: 'assistant',
+        content: '我是 Aletheia。请告诉我，此刻你心中正压抑着什么？',
+        thought: '初始化荣格心理模型...\n校准潜意识参数...',
+        isThoughtExpanded: false,
+        isStreaming: false
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // Metadata Handlers
@@ -73,6 +152,10 @@ Page({
       messages[messages.length - 1] = { ...lastMsg, ...updates };
       this.setData({ messages });
     }
+  },
+
+  scrollToBottom() {
+    this.setData({ scrollTarget: 'bottom-anchor' });
   },
 
   async sendMessage() {
@@ -194,48 +277,78 @@ Page({
       }
 
       // --- SAVE TO DB ---
-      // Analysis complete. Save to Cloud DB.
-      console.log("Saving dream to DB...");
-      wx.cloud.callFunction({
-        name: 'saveDream',
-        data: {
-          content: content,
-          analysis: fullAnalysisText,
-          mood: currentMood,
-          clarity: currentClarity
+      // Analysis complete. Save to Cloud DB and Conversation History.
+      console.log("Saving dream and conversation to DB...");
+      
+      try {
+        // 1. 保存到对话历史
+        let currentConversationId = this.data.conversationId;
+        
+        if (this.data.isNewConversation) {
+          // 创建新对话
+          currentConversationId = await conversationService.createConversation(
+            content,
+            currentMood,
+            currentClarity
+          );
+          this.setData({
+            conversationId: currentConversationId,
+            isNewConversation: false
+          });
         }
-      }).then((res: any) => {
-        console.log("Dream saved:", res);
-        if (res.result && res.result.success) {
-          const summary = res.result.summary || '梦境已记录';
-          const keywords = res.result.keywords || [];
-          wx.showToast({ 
-            title: `已记录:${summary.substring(0, 6)}${summary.length > 6 ? '...' : ''}`, 
-            icon: 'none',
-            duration: 2000
-          });
-          
-          // 更新用户统计（连续天数等）
-          wx.cloud.callFunction({
-            name: 'updateUser',
-            data: { action: 'recordDream' }
-          }).catch(err => {
-            console.error("更新用户统计失败:", err);
-          });
-          
-          // 触发全局事件通知首页刷新
-          const app = getApp<IAppOption>();
-          if (app.globalData) {
-            app.globalData.refreshDreamList = true;
+        
+        // 2. 保存所有消息到对话历史
+        const messagesToSave: ChatMessage[] = this.data.messages.map(msg => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          thought: msg.thought,
+          isThoughtExpanded: msg.isThoughtExpanded,
+          timestamp: Date.now()
+        }));
+        
+        await conversationService.saveMessages(currentConversationId, messagesToSave);
+        
+        // 3. 保存到梦境数据库（原有的梦境记录功能）
+        wx.cloud.callFunction({
+          name: 'saveDream',
+          data: {
+            content: content,
+            analysis: fullAnalysisText,
+            mood: currentMood,
+            clarity: currentClarity
           }
-        } else {
-          console.error("Save returned error:", res);
-          wx.showToast({ title: '保存失败', icon: 'error' });
-        }
-      }).catch(err => {
-        console.error("Failed to save dream:", err);
-        wx.showToast({ title: '保存失败', icon: 'error' });
-      });
+        }).then((res: any) => {
+          console.log("Dream saved:", res);
+          if (res.result && res.result.success) {
+            const summary = res.result.summary || '梦境已记录';
+            wx.showToast({ 
+              title: `已记录:${summary.substring(0, 6)}${summary.length > 6 ? '...' : ''}`, 
+              icon: 'none',
+              duration: 2000
+            });
+            
+            // 更新用户统计
+            wx.cloud.callFunction({
+              name: 'updateUser',
+              data: { action: 'recordDream' }
+            }).catch(err => {
+              console.error("更新用户统计失败:", err);
+            });
+            
+            // 触发全局事件通知首页刷新
+            const app = getApp<IAppOption>();
+            if (app.globalData) {
+              app.globalData.refreshDreamList = true;
+            }
+          }
+        }).catch(err => {
+          console.error("Failed to save dream:", err);
+        });
+        
+      } catch (convErr) {
+        console.error("保存对话历史失败:", convErr);
+      }
       // ------------------
 
     } catch (err: any) {

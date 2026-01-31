@@ -69,6 +69,11 @@ exports.main = async (event, context) => {
 
       summary = summaryRes.text || summary
       
+      // 确保 summary 不为空
+      if (!summary || summary.trim() === '') {
+        summary = '无题梦境'
+      }
+      
       // 解析关键词
       if (!keywords && keywordsRes.text) {
         try {
@@ -88,7 +93,7 @@ exports.main = async (event, context) => {
     }
   } catch (err) {
     console.error("AI处理失败:", err)
-    summary = content.substring(0, 8) + "..."
+    summary = "无题梦境"
   }
 
   // 根据情绪计算原型得分（简单规则，后续可由AI分析替代）
@@ -96,13 +101,16 @@ exports.main = async (event, context) => {
     scores = calculateArchetypeScores(mood, content)
   }
 
+  // 确保 summary 不为空字符串
+  const finalSummary = summary.replace(/["《》]/g, '').trim() || '无题梦境'
+
   try {
     const res = await db.collection('dreams').add({
       data: {
         _openid: OPENID,
         content: content,
         analysis: analysis,
-        summary: summary.replace(/["《》]/g, '').trim(),
+        summary: finalSummary,
         mood: mood || 'unknown',
         clarity: clarity || 3,
         keywords: extractedKeywords,
@@ -115,7 +123,7 @@ exports.main = async (event, context) => {
     return {
       success: true,
       id: res._id,
-      summary: summary.replace(/["《》]/g, '').trim(),
+      summary: finalSummary,
       keywords: extractedKeywords
     }
   } catch (err) {
