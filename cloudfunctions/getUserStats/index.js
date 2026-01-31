@@ -103,7 +103,7 @@ exports.main = async (event, context) => {
         dominantMood,
         
         // 连续记录
-        streakDays: userProfile?.streakDays || 0,
+        streakDays: (userProfile && userProfile.streakDays) || 0,
         
         // 最近记录
         recentDreamsList: formattedDreams

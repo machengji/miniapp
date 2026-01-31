@@ -155,10 +155,10 @@ Page({
       wx.cloud.callFunction({
         name: 'getUserStats'
       }).then((res: any) => {
-        if (res.result?.success) {
+        if (res.result && res.result.success) {
           resolve(res.result.stats);
         } else {
-          reject(new Error(res.result?.error || '获取统计失败'));
+          reject(new Error((res.result && res.result.error) || '获取统计失败'));
         }
       }).catch(reject);
     });

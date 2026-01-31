@@ -59,7 +59,7 @@ App<IAppOption>({
       data: {}
     }).then((res: any) => {
       console.log('用户档案初始化:', res.result);
-      if (res.result?.isNewUser) {
+      if (res.result && res.result.isNewUser) {
         console.log('欢迎新用户！');
       }
     }).catch(err => {

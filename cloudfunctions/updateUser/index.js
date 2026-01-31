@@ -38,8 +38,8 @@ exports.main = async (event, context) => {
       // 新用户，创建档案
       const newUser = {
         _openid: OPENID,
-        nickName: userInfo?.nickName || '匿名用户',
-        avatarUrl: userInfo?.avatarUrl || '',
+        nickName: (userInfo && userInfo.nickName) || '匿名用户',
+        avatarUrl: (userInfo && userInfo.avatarUrl) || '',
         joinDate: db.serverDate(),
         lastActive: db.serverDate(),
         totalDreams: 0,
