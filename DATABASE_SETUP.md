@@ -32,6 +32,36 @@
 }
 ```
 
+### 3. conversations（对话列表）- **需要创建**
+
+```
+云开发控制台 → 数据库
+→ 点击 "+ 添加集合"
+→ 输入：conversations
+→ 点击 "确定"
+
+数据权限设置：
+{
+  "read": "doc._openid == auth.openid",
+  "write": "doc._openid == auth.openid"
+}
+```
+
+### 4. chat_messages（对话消息）- **需要创建**
+
+```
+云开发控制台 → 数据库
+→ 点击 "+ 添加集合"
+→ 输入：chat_messages
+→ 点击 "确定"
+
+数据权限设置：
+{
+  "read": "doc._openid == auth.openid",
+  "write": "doc._openid == auth.openid"
+}
+```
+
 ---
 
 ## 创建步骤（图文）

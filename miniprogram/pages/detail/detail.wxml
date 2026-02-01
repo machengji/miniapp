@@ -87,12 +87,17 @@
       <!-- 12原型得分（如果有） -->
       <view class="archetype-section" wx:if="{{dream.archetypeScores}}">
         <text class="section-label">原型能量分布</text>
-        <view class="archetype-list">
-          <view class="archetype-item" wx:for="{{[['天真者','innocent'],['孤儿','orphan'],['英雄','hero'],['照顾者','caregiver'],['探索者','explorer'],['反叛者','rebel'],['情人','lover'],['创造者','creator'],['小丑','jester'],['智者','sage'],['魔术师','magician'],['统治者','ruler']]}}" wx:key="*this">
-            <text class="archetype-name">{{item[0]}}</text>
-            <view class="archetype-bar">
-              <view class="archetype-fill" style="width: {{dream.archetypeScores[item[1]] || 20}}%"></view>
+        <view class="archetype-grid">
+          <!-- 仅显示得分最高的3个 -->
+          <view class="archetype-card" wx:for="{{[['天真者','innocent'],['孤儿','orphan'],['英雄','hero'],['照顾者','caregiver'],['探索者','explorer'],['反叛者','rebel'],['情人','lover'],['创造者','creator'],['小丑','jester'],['智者','sage'],['魔术师','magician'],['统治者','ruler']]}}" 
+                wx:key="*this"
+                wx:if="{{dream.archetypeScores[item[1]] > 30}}">
+            <image class="card-icon" src="/images/archetypes/{{item[1]}}.svg" mode="aspectFit"></image>
+            <text class="card-name">{{item[0]}}</text>
+            <view class="card-bar">
+              <view class="card-fill" style="width: {{dream.archetypeScores[item[1]]}}%"></view>
             </view>
+            <text class="card-score">{{dream.archetypeScores[item[1]]}}</text>
           </view>
         </view>
       </view>

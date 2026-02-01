@@ -1,0 +1,5 @@
+/* Incense Canvas Component Styles */
+.incense-canvas {
+  width: 750rpx;
+  height: 800rpx;
+}

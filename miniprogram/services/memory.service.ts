@@ -23,8 +23,8 @@ class MemoryService {
   private SIMILARITY_THRESHOLD: number;
 
   constructor() {
-    this.MAX_MEMORY_ITEMS = 5;
-    this.MAX_CONTENT_LENGTH = 200;
+    this.MAX_MEMORY_ITEMS = 2; // 减少到2条
+    this.MAX_CONTENT_LENGTH = 100; // 减少到100字
     this.SIMILARITY_THRESHOLD = 0.3;
   }
 
@@ -38,7 +38,7 @@ class MemoryService {
       const db = wx.cloud.database();
       const { data } = await db.collection('dreams')
         .orderBy('createTime', 'desc')
-        .limit(20) // 先取20条，然后筛选
+        .limit(10) // 减少到10条
         .get();
 
       if (data.length === 0) {
@@ -127,14 +127,14 @@ class MemoryService {
   }
 
   /**
-   * 构建记忆上下文文本
+   * 构建记忆上下文文本（精简版）
    */
   private buildMemoryContext(
     relatedDreams: DreamRecord[],
     allDreams: DreamRecord[]
   ): MemoryContext {
     
-    // 提取重复出现的意象（在多条梦境中出现的关键词）
+    // 提取重复出现的意象
     const keywordCounts: Record<string, number> = {};
     allDreams.forEach(dream => {
       if (dream.keywords) {
@@ -147,100 +147,31 @@ class MemoryService {
     const recurrentSymbols = Object.entries(keywordCounts)
       .filter(([_, count]) => count > 1)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
+      .slice(0, 3)
       .map(([kw, _]) => kw);
 
-    // 分析情绪趋势
-    const emotionTrend = this.analyzeEmotionTrend(allDreams);
-
-    // 构建记忆文本
-    let memoryText = '\n\n【长期记忆档案】\n';
-    memoryText += `该用户累计记录 ${allDreams.length} 个梦境。\n\n`;
+    // 构建极简记忆文本
+    let memoryText = `历史梦境${allDreams.length}次。`;
     
     if (recurrentSymbols.length > 0) {
-      memoryText += `【反复出现的意象】${recurrentSymbols.join('、')}\n\n`;
+      memoryText += `反复：${recurrentSymbols.join('、')}。`;
     }
 
-    if (emotionTrend) {
-      memoryText += `【情绪趋势】${emotionTrend}\n\n`;
+    // 只保留最近2条梦境的极简摘要
+    if (relatedDreams.length > 0) {
+      memoryText += '近期：';
+      relatedDreams.slice(0, 2).forEach(dream => {
+        const summary = dream.summary || dream.content.substring(0, 20);
+        memoryText += `${summary.substring(0, 15)}... `;
+      });
     }
-
-    memoryText += '【相关历史梦境】（按时间倒序）：\n';
-    
-    relatedDreams.forEach((dream, index) => {
-      const date = new Date(dream.createTime);
-      const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-      
-      // 截断内容，避免过长
-      let content = dream.content;
-      if (content.length > this.MAX_CONTENT_LENGTH) {
-        content = content.substring(0, this.MAX_CONTENT_LENGTH) + '...';
-      }
-      
-      memoryText += `${index + 1}. [${dateStr}] `;
-      if (dream.summary) {
-        memoryText += `《${dream.summary}》`;
-      }
-      if (dream.mood && dream.mood !== 'unknown') {
-        memoryText += `[${dream.mood}]`;
-      }
-      memoryText += `：${content}\n`;
-      
-      if (dream.keywords && dream.keywords.length > 0) {
-        memoryText += `   关键词：${dream.keywords.slice(0, 3).join('、')}\n`;
-      }
-    });
-
-    memoryText += '\n【分析指令】\n';
-    memoryText += '1. 寻找重复意象：上述历史中是否有意象再次出现？形态有何变化？\n';
-    memoryText += '2. 对比情绪曲线：用户当前情绪与历史相比是恶化了还是改善了？\n';
-    memoryText += '3. 指出联系：在回复中显式地指出与历史的联系（例如：“这让你想起了...”）\n';
 
     return {
       text: memoryText,
       relatedDreams,
       recurrentSymbols,
-      emotionTrend
+      emotionTrend: ''
     };
-  }
-
-  /**
-   * 分析情绪趋势
-   */
-  private analyzeEmotionTrend(dreams: DreamRecord[]): string {
-    if (dreams.length < 2) return '';
-
-    // 情绪权重（负面到正面）
-    const emotionWeights: Record<string, number> = {
-      '喜悦': 2,
-      '平静': 1,
-      '困惑': 0,
-      '焦虑': -1,
-      '恐惧': -2,
-      '悲伤': -2,
-      '愤怒': -2,
-      '羞耻': -2
-    };
-
-    // 最近3次的情绪
-    const recentMoods = dreams.slice(0, 3).map(d => d.mood);
-    const recentWeights = recentMoods.map(m => emotionWeights[m] || 0);
-    const recentAvg = recentWeights.reduce((a, b) => a + b, 0) / recentWeights.length;
-
-    // 更早的情绪（第4-6次）
-    const olderMoods = dreams.slice(3, 6).map(d => d.mood);
-    const olderWeights = olderMoods.map(m => emotionWeights[m] || 0);
-    const olderAvg = olderWeights.length > 0 
-      ? olderWeights.reduce((a, b) => a + b, 0) / olderWeights.length 
-      : 0;
-
-    if (recentAvg > olderAvg + 0.5) {
-      return '近期情绪有明显好转，积极情绪增多';
-    } else if (recentAvg < olderAvg - 0.5) {
-      return '近期情绪波动较大，可能存在压抑或焦虑';
-    } else {
-      return '近期情绪相对稳定';
-    }
   }
 
   /**

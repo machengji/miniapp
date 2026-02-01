@@ -1,3 +1,4 @@
+<!-- 梦境详情页 -->
 <navigation-bar title="心灵报告" back="{{true}}" color="white" background="#121212" bind:heightready="onNavBarHeightReady"></navigation-bar>
 
 <scroll-view class="report-container" scroll-y>
@@ -61,18 +62,37 @@
       </view>
     </view>
 
-    <!-- 原型雷达图 -->
+    <!-- 原型星系图 -->
     <view class="section">
-      <view class="section-title">原型能量分布</view>
+      <view class="section-title">原型能量星系</view>
       <view class="section-subtitle">基于荣格12原型理论</view>
-      <view class="radar-container">
-        <canvas type="2d" id="radarCanvas" class="radar-canvas"></canvas>
-      </view>
-      <view class="archetype-legend">
-        <view class="legend-item" wx:for="{{archetypes}}" wx:key="name">
-          <text class="legend-icon">{{item.icon}}</text>
-          <text class="legend-name">{{item.name}}</text>
-          <text class="legend-value">{{item.value}}</text>
+      
+      <view class="galaxy-container">
+        <!-- 背景轨道 -->
+        <view class="orbit orbit-1"></view>
+        <view class="orbit orbit-2"></view>
+        <view class="orbit orbit-3"></view>
+        
+        <!-- 中心恒星 -->
+        <view class="center-star">
+          <view class="star-core"></view>
+          <view class="star-glow"></view>
+        </view>
+
+        <!-- 原型行星 -->
+        <view class="planet-item" 
+              wx:for="{{archetypes}}" 
+              wx:key="key"
+              style="--angle: {{index * 30}}deg; --delay: {{index * 0.1}}s; --scale: {{item.value / 60}};">
+          <view class="planet-orbit-line"></view>
+          <view class="planet-body">
+            <image class="planet-icon" src="{{item.icon}}" mode="aspectFit"></image>
+            <view class="planet-glow" style="opacity: {{item.value / 100}}"></view>
+          </view>
+          <view class="planet-label">
+            <text class="name">{{item.name}}</text>
+            <text class="value">{{item.value}}</text>
+          </view>
         </view>
       </view>
     </view>
@@ -109,6 +129,6 @@
 
 <!-- 分享按钮 -->
 <view class="share-btn" bindtap="shareReport" wx:if="{{totalDreams > 0}}">
-  <image class="share-icon svg-icon" src="/images/icons/share.svg" mode="aspectFit" style="width: 32rpx; height: 32rpx; margin-right: 8rpx;"></image>
+  <image class="share-icon" src="/images/icons/share.svg" mode="aspectFit"></image>
   <text class="share-text">分享报告</text>
 </view>

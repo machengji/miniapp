@@ -1,0 +1,85 @@
+/* Merit Page Styles */
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f6fa;
+  padding: 40rpx;
+}
+
+.header {
+  width: 100%;
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.merit-display {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+  margin-top: 60rpx;
+}
+
+.merit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.label {
+  font-size: 28rpx;
+  color: #7f8c8d;
+  margin-bottom: 20rpx;
+}
+
+.value {
+  font-size: 64rpx;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+.history {
+  width: 100%;
+  margin-top: 60rpx;
+}
+
+.history-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 30rpx;
+}
+
+.actions {
+  width: 100%;
+  margin-top: auto;
+  padding-bottom: 40rpx;
+}
+
+.back-btn {
+  width: 100%;
+  height: 88rpx;
+  background-color: #3498db;
+  color: #ffffff;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 44rpx;
+}

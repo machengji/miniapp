@@ -205,7 +205,7 @@ scroll-view {
   align-items: center;
   border-top: 1rpx solid #333;
   z-index: 50;
-  gap: 16rpx;
+  gap: 12rpx;
 
   .input-wrapper {
     flex: 1;
@@ -214,34 +214,28 @@ scroll-view {
     gap: 12rpx;
   }
 
-  .mood-tags-scroll {
-    width: 100%;
-    height: 52rpx;
-    margin-bottom: 8rpx;
-    
-    ::-webkit-scrollbar {
-      display: none;
-    }
+  .mood-tags-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8rpx;
+    margin-bottom: 12rpx;
+    overflow: hidden;
 
     .mood-tag {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10rpx 20rpx;
+      padding: 0 12rpx;
       background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
       color: #bbb;
-      border-radius: 24rpx;
-      font-size: 22rpx;
-      margin-right: 10rpx;
+      border-radius: 20rpx;
+      font-size: 20rpx;
       border: 1rpx solid rgba(255, 255, 255, 0.05);
       transition: all 0.2s;
-      min-width: 72rpx;
-      height: 44rpx;
+      flex-shrink: 0;
+      height: 40rpx;
       box-sizing: border-box;
-
-      &:last-child {
-        margin-right: 20rpx;
-      }
+      white-space: nowrap;
 
       &.selected {
         background: linear-gradient(145deg, rgba(201, 168, 108, 0.2), rgba(201, 168, 108, 0.1));
@@ -278,8 +272,8 @@ scroll-view {
   }
 
   .send-btn {
-    width: 76rpx;
-    height: 76rpx;
+    width: 72rpx;
+    height: 72rpx;
     background: linear-gradient(145deg, #3a3a3a, #2e2e2e);
     border-radius: 50%;
     display: flex;
@@ -319,8 +313,8 @@ scroll-view {
 }
 
   .meta-toggle-btn {
-    width: 76rpx;
-    height: 76rpx;
+    width: 72rpx;
+    height: 72rpx;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -428,6 +422,7 @@ scroll-view {
     width: 100%;
     height: 88rpx;
     margin-bottom: 20rpx;
+    white-space: nowrap;
     
     ::-webkit-scrollbar {
       display: none;

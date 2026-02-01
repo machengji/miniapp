@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar"
+  },
+  "navigationBarTitleText": "心灵报告",
+  "backgroundColor": "#121212",
+  "enableShareAppMessage": true
+}

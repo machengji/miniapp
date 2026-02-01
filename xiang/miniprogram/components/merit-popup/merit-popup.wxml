@@ -1,0 +1,8 @@
+<!-- Merit Popup Component -->
+<view
+  class="merit-popup"
+  style="left: {{position.x}}px; top: {{position.y}}px;"
+  bindanimationend="onAnimationEnd"
+>
+  <text class="merit-text">功德+{{amount}}</text>
+</view>

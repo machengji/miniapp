@@ -1,0 +1,23 @@
+<!-- Shop Page -->
+<view class="container">
+  <view class="header">
+    <text class="title">香铺</text>
+  </view>
+
+  <view class="incense-list">
+    <!-- TODO: Add incense list -->
+    <view class="incense-item">
+      <text class="name">静心线香</text>
+      <text class="price">免费</text>
+    </view>
+  </view>
+
+  <view class="cyber-section">
+    <text class="section-title">赛博系列</text>
+    <view class="cyber-item">
+      <text class="name">赛博电子烟</text>
+      <text class="price">广告解锁</text>
+      <button class="unlock-btn" bindtap="onUnlockCyberIncense">解锁</button>
+    </view>
+  </view>
+</view>

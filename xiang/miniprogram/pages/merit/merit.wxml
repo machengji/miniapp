@@ -1,0 +1,26 @@
+<!-- Merit Page -->
+<view class="container">
+  <view class="header">
+    <text class="title">功德簿</text>
+  </view>
+
+  <view class="merit-display">
+    <view class="merit-item">
+      <text class="label">今日功德</text>
+      <text class="value">{{todayMerit}}</text>
+    </view>
+    <view class="merit-item">
+      <text class="label">累计功德</text>
+      <text class="value">{{totalMerit}}</text>
+    </view>
+  </view>
+
+  <view class="history">
+    <text class="history-title">功德记录</text>
+    <!-- TODO: Add merit history list -->
+  </view>
+
+  <view class="actions">
+    <button class="back-btn" bindtap="onBack">返回主殿</button>
+  </view>
+</view>

@@ -84,23 +84,21 @@
 </view>
 
 <view class="input-area">
-  <view class="meta-toggle-btn {{isMetadataVisible ? 'active' : ''}}" bindtap="toggleMetadata">
-    <image src="/images/icons/settings.svg" mode="aspectFit"></image>
+  <view class="meta-toggle-btn {{isMetadataVisible ? 'active' : ''}}" bindtap="toggleMetadata" style="display: flex; align-items: center; justify-content: center;">
+    <image src="/images/icons/settings.svg" mode="aspectFit" style="width: 40rpx; height: 40rpx;"></image>
   </view>
   <view class="input-wrapper">
-    <scroll-view class="mood-tags-scroll" scroll-x="true" show-scrollbar="{{false}}">
-      <view style="display: inline-block; white-space: nowrap;">
-        <view
-          class="mood-tag {{selectedMood === item ? 'selected' : ''}}"
-          wx:for="{{moodOptions}}"
-          wx:key="*this"
-          bindtap="selectMood"
-          data-mood="{{item}}"
-        >
-          {{item}}
-        </view>
+    <view class="mood-tags-wrapper">
+      <view
+        class="mood-tag {{selectedMood === item ? 'selected' : ''}}"
+        wx:for="{{moodOptions}}"
+        wx:key="*this"
+        bindtap="selectMood"
+        data-mood="{{item}}"
+      >
+        {{item}}
       </view>
-    </scroll-view>
+    </view>
     <input
       class="chat-input"
       type="text"

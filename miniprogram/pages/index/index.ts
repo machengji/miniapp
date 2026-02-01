@@ -173,8 +173,10 @@ Page({
    * 加载对话历史
    */
   async loadConversations(): Promise<Conversation[]> {
+    console.log("[INDEX DEBUG] 开始加载对话列表...");
     try {
       const conversations = await conversationService.getConversations(20);
+      console.log("[INDEX DEBUG] 加载到对话数量:", conversations.length);
       
       // 格式化时间
       const now = new Date();
@@ -397,7 +399,15 @@ Page({
    * 跳转到报告页
    */
   goToReport() {
-    wx.navigateTo({ url: '../report/report' });
+    console.log('点击了前往报告页按钮');
+    wx.vibrateShort({ type: 'light' });
+    wx.navigateTo({ 
+      url: '../report/report',
+      fail: (err) => {
+        console.error('跳转报告页失败:', err);
+        wx.showToast({ title: '跳转失败', icon: 'none' });
+      }
+    });
   },
 
   /**

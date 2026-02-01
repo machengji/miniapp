@@ -14,7 +14,7 @@
               aria-role="button"
               aria-label="返回"
             >
-              <view class="weui-navigation-bar__button weui-navigation-bar__btn_goback" style="background-color: {{color}};"></view>
+              <view class="weui-navigation-bar__button weui-navigation-bar__btn_goback"></view>
             </view>
           </view>
         </block>
@@ -28,7 +28,7 @@
               aria-role="button"
               aria-label="首页"
             >
-              <view class="weui-navigation-bar__button weui-navigation-bar__btn_home" style="background-color: {{color}};"></view>
+              <view class="weui-navigation-bar__button weui-navigation-bar__btn_home"></view>
             </view>
           </view>
         </block>

@@ -21,7 +21,7 @@ Page({
     isNewConversation: true,
     // Dream Metadata
     isMetadataVisible: false,
-    moodOptions: ['焦虑', '恐惧', '喜悦', '悲伤', '困惑', '平静', '愤怒', '羞耻'],
+    moodOptions: ['焦虑', '恐惧', '喜悦', '悲伤', '困惑', '平静', '愤怒'],
     selectedMood: '困惑',
     clarity: 3,
     // 导航栏高度
@@ -332,38 +332,82 @@ Page({
 
       // --- SAVE TO DB ---
       // Analysis complete. Save to Cloud DB and Conversation History.
-      console.log("Saving dream and conversation to DB...");
+      console.log("[SAVE DEBUG] ========== 开始保存流程 ==========");
+      console.log("[SAVE DEBUG] 当前状态:", {
+        isNewConversation: this.data.isNewConversation,
+        conversationId: this.data.conversationId,
+        messagesCount: this.data.messages.length
+      });
       
       try {
         // 1. 保存到对话历史
         let currentConversationId = this.data.conversationId;
         
         if (this.data.isNewConversation) {
-          // 创建新对话
-          currentConversationId = await conversationService.createConversation(
-            content,
-            currentMood,
-            currentClarity
-          );
-          this.setData({
-            conversationId: currentConversationId,
-            isNewConversation: false
-          });
+          console.log("[SAVE DEBUG] 创建新对话...");
+          console.log("[SAVE DEBUG] 参数:", { content: content.substring(0, 30), currentMood, currentClarity });
+          
+          try {
+            currentConversationId = await conversationService.createConversation(
+              content,
+              currentMood,
+              currentClarity
+            );
+            console.log("[SAVE DEBUG] 新对话创建成功, ID:", currentConversationId);
+            
+            this.setData({
+              conversationId: currentConversationId,
+              isNewConversation: false
+            });
+            console.log("[SAVE DEBUG] 状态已更新");
+          } catch (createErr: any) {
+            console.error("[SAVE DEBUG] 创建对话失败:", createErr);
+            throw createErr;
+          }
+        } else {
+          console.log("[SAVE DEBUG] 使用现有对话, ID:", currentConversationId);
         }
         
         // 2. 保存所有消息到对话历史
-        const messagesToSave: ChatMessage[] = this.data.messages.map(msg => ({
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          thought: msg.thought,
-          isThoughtExpanded: msg.isThoughtExpanded,
-          timestamp: Date.now()
-        }));
+        console.log("[SAVE DEBUG] 准备保存消息, 消息数量:", this.data.messages.length);
         
-        await conversationService.saveMessages(currentConversationId, messagesToSave);
+        // 过滤掉空消息和系统欢迎消息
+        const validMessages = this.data.messages.filter(msg => {
+          const isValid = msg.content && msg.content.trim().length > 0 && msg.id !== 'system_welcome';
+          if (!isValid) {
+            console.log("[SAVE DEBUG] 过滤掉消息:", { id: msg.id, role: msg.role, hasContent: !!msg.content });
+          }
+          return isValid;
+        });
+        
+        console.log("[SAVE DEBUG] 有效消息数量:", validMessages.length);
+        
+        const messagesToSave: ChatMessage[] = validMessages.map((msg, index) => {
+          const saveMsg = {
+            id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            thought: msg.thought,
+            isThoughtExpanded: msg.isThoughtExpanded,
+            timestamp: Date.now() + index // 添加index确保时间戳唯一
+          };
+          console.log("[SAVE DEBUG] 消息准备:", { id: saveMsg.id, role: saveMsg.role, contentLength: saveMsg.content && saveMsg.content.length });
+          return saveMsg;
+        });
+        
+        console.log("[SAVE DEBUG] 开始调用 saveMessages, conversationId:", currentConversationId);
+        
+        try {
+          await conversationService.saveMessages(currentConversationId, messagesToSave);
+          console.log("[SAVE DEBUG] saveMessages 调用成功");
+        } catch (saveMsgErr: any) {
+          console.error("[SAVE DEBUG] saveMessages 失败:", saveMsgErr);
+          throw saveMsgErr;
+        }
         
         // 3. 保存到梦境数据库（原有的梦境记录功能）
+        console.log("[SAVE DEBUG] 开始保存到梦境数据库...");
+        
         wx.cloud.callFunction({
           name: 'saveDream',
           data: {
@@ -373,7 +417,7 @@ Page({
             clarity: currentClarity
           }
         }).then((res: any) => {
-          console.log("Dream saved:", res);
+          console.log("[SAVE DEBUG] saveDream 结果:", res);
           if (res.result && res.result.success) {
             const summary = res.result.summary || '梦境已记录';
             wx.showToast({ 
@@ -387,7 +431,7 @@ Page({
               name: 'updateUser',
               data: { action: 'recordDream' }
             }).catch(err => {
-              console.error("更新用户统计失败:", err);
+              console.error("[SAVE DEBUG] 更新用户统计失败:", err);
             });
             
             // 触发全局事件通知首页刷新
@@ -395,14 +439,18 @@ Page({
             if (app.globalData) {
               app.globalData.refreshDreamList = true;
             }
+          } else {
+            console.error("[SAVE DEBUG] saveDream 返回失败:", res.result);
           }
         }).catch(err => {
-          console.error("Failed to save dream:", err);
+          console.error("[SAVE DEBUG] saveDream 调用失败:", err);
         });
         
-      } catch (convErr) {
-        console.error("保存对话历史失败:", convErr);
+      } catch (convErr: any) {
+        console.error("[SAVE DEBUG] 保存流程出错:", convErr);
+        wx.showToast({ title: '保存失败', icon: 'none' });
       }
+      console.log("[SAVE DEBUG] ========== 保存流程结束 ==========");
       // ------------------
 
     } catch (err: any) {
@@ -430,37 +478,22 @@ Page({
    * 构建系统提示词
    */
   buildSystemPrompt(memoryContext: string, memoryData: MemoryContext | null): string {
-    let prompt = `你是一位深度的荣格流派心理分析师，代号"Aletheia"。你的任务是揭示用户潜意识的动力。
+    let prompt = `你是荣格心理分析师Aletheia。分析梦境，揭示潜意识。
 
-核心原则：
-1. **严禁算命**：绝对不要使用"吉凶"、"运势"、"前世"等迷信词汇
-2. **深度挖掘**：使用荣格概念（阴影、阿尼玛/阿尼姆斯、面具、共时性、集体无意识）来解释
-3. **思考外显**：在回答前，先在 <think> 标签中进行深度推理，分析用户的防御机制和潜意识原型
-4. **冷峻而包容**：语气保持神秘、客观、深邃，不要过于热情客套
-5. **联系历史**：如果提供了历史梦境档案，必须显式地指出梦境之间的联系
+规则：
+1. 严禁算命、预测吉凶
+2. 用荣格概念（阴影、阿尼玛、原型）分析
+3. <think>内写推理，外面写结论
+4. 回复控制在300字内，简洁直接
+5. 不要客套话、问候语、总结性废话`;
 
-分析框架：
-- 识别梦中的原型意象（水、火、动物、人物等）
-- 探索阴影投射（被压抑的部分）
-- 分析阿尼玛/阿尼姆斯（内在异性形象）
-- 解读集体无意识中的象征
-- 注意重复出现的模式`;
-
-    // 添加记忆上下文（如果有）
-    if (memoryContext) {
-      prompt += '\n\n' + memoryContext;
+    // 添加记忆上下文（精简版）
+    if (memoryContext && memoryData && memoryData.relatedDreams.length > 0) {
+      prompt += `\n\n历史梦境：${memoryData.relatedDreams.length}次。`;
+      if (memoryData.recurrentSymbols.length > 0) {
+        prompt += `反复意象：${memoryData.recurrentSymbols.slice(0, 2).join('、')}。`;
+      }
     }
-
-    // 添加个性化提示（根据记忆数据）
-    if (memoryData && memoryData.recurrentSymbols.length > 0) {
-      prompt += `\n\n【特别提醒】该用户反复梦见"${memoryData.recurrentSymbols.slice(0, 3).join('、')}"等意象，这可能指向其核心情结。请特别关注这些重复意象的变化。`;
-    }
-
-    prompt += `\n\n回复格式：
-<think>
-你的深度推理过程...
-</think>
-正式回复内容...`;
 
     return prompt;
   },

@@ -1,0 +1,30 @@
+<!-- Main Hall Page -->
+<view class="container">
+  <view class="temple-header">
+    <text class="title">赛博焚香</text>
+    <text class="subtitle">心诚则灵 · 积功德</text>
+  </view>
+
+  <view class="prayer-grid">
+    <view
+      class="prayer-item"
+      wx:for="{{prayerTypes}}"
+      wx:key="id"
+      data-type="{{item.id}}"
+      bindtap="onPrayerSelect"
+    >
+      <text class="prayer-icon">{{item.icon}}</text>
+      <text class="prayer-name">{{item.name}}</text>
+      <text class="prayer-desc">{{item.desc}}</text>
+    </view>
+  </view>
+
+  <view class="merit-float" bindtap="onShowMerit">
+    <text class="merit-icon">📿</text>
+    <text class="merit-text">功德 {{todayMerit}}</text>
+  </view>
+
+  <view class="footer">
+    <button class="footer-btn" bindtap="onShowShop">香铺</button>
+  </view>
+</view>

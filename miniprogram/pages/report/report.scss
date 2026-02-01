@@ -6,9 +6,10 @@ page {
 
 .report-container {
   margin-top: 88px;
+  height: 100vh;
   padding: 40rpx;
-  padding-top: calc(40rpx + {{navBarHeight}}px);
-  padding-bottom: 140rpx;
+  padding-bottom: 200rpx;
+  box-sizing: border-box;
 }
 
 // ===== 加载状态 =====
@@ -211,48 +212,133 @@ page {
     }
   }
 
-// ===== 雷达图 =====
-.radar-container {
+// ===== 星系能量图 =====
+.galaxy-container {
+  position: relative;
+  width: 100%;
+  height: 600rpx;
   display: flex;
   justify-content: center;
-  margin-bottom: 30rpx;
-  
-  .radar-canvas {
-    width: 500rpx;
-    height: 500rpx;
-  }
-}
+  align-items: center;
+  margin: 40rpx 0;
+  overflow: visible;
 
-.archetype-legend {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16rpx;
-  
-  .legend-item {
+  // 轨道
+  .orbit {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+
+    &.orbit-1 { width: 200rpx; height: 200rpx; animation: spin-slow 60s linear infinite; }
+    &.orbit-2 { width: 360rpx; height: 360rpx; animation: spin-slow 80s linear infinite reverse; }
+    &.orbit-3 { width: 520rpx; height: 520rpx; opacity: 0.5; }
+  }
+
+  // 中心恒星
+  .center-star {
+    position: absolute;
+    width: 60rpx;
+    height: 60rpx;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 16rpx 8rpx;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12rpx;
-    
-    .legend-icon {
-      font-size: 32rpx;
-      margin-bottom: 8rpx;
+
+    .star-core {
+      width: 20rpx;
+      height: 20rpx;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 20rpx #fff, 0 0 40rpx var(--primary);
     }
     
-    .legend-name {
-      font-size: 22rpx;
-      color: #888;
-      margin-bottom: 4rpx;
+    .star-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201, 168, 108, 0.4) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
     }
-    
-      .legend-value {
-        font-size: 24rpx;
-        font-weight: 600;
-        color: var(--primary);
+  }
+
+  // 行星
+  .planet-item {
+    position: absolute;
+    // 基础位置在中心
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // 旋转到对应角度
+    transform: rotate(var(--angle));
+
+    .planet-orbit-line {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 240rpx; // 半径
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05) 50%, transparent);
+      transform-origin: left center;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards var(--delay);
+    }
+
+    .planet-body {
+      position: absolute;
+      // 推送到轨道上
+      transform: translateX(220rpx) rotate(calc(var(--angle) * -1)); // 反向旋转保持图标竖直
+      width: 80rpx;
+      height: 80rpx;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      
+      .planet-icon {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 0 4rpx rgba(0,0,0,0.5));
+        transform: scale(var(--scale)); // 根据能量值缩放
+        transition: transform 0.5s ease;
+      }
+
+      .planet-glow {
+        position: absolute;
+        width: 120%;
+        height: 120%;
+        background: radial-gradient(circle, rgba(201, 168, 108, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: -1;
       }
     }
+
+    .planet-label {
+      position: absolute;
+      transform: translateX(220rpx) rotate(calc(var(--angle) * -1)) translateY(50rpx);
+      text-align: center;
+      width: 120rpx;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards calc(var(--delay) + 0.5s);
+
+      .name {
+        display: block;
+        font-size: 20rpx;
+        color: #aaa;
+        margin-bottom: 2rpx;
+      }
+
+      .value {
+        font-size: 22rpx;
+        color: var(--primary);
+        font-weight: bold;
+      }
+    }
+  }
 }
 
 // ===== 情绪分布 =====
@@ -313,34 +399,84 @@ page {
 .share-btn {
   position: fixed;
   right: 40rpx;
-  bottom: 80rpx;
+  bottom: 100rpx;
   display: flex;
   align-items: center;
-  padding: 24rpx 40rpx;
-  background: var(--primary-gradient);
-  border-radius: 50rpx;
-  box-shadow: var(--shadow-primary);
+  padding: 20rpx 36rpx;
+  background: linear-gradient(145deg, #D4AF37 0%, #C5A028 50%, #B08D1E 100%);
+  border-radius: 40rpx;
+  box-shadow:
+    0 8rpx 32rpx rgba(212, 175, 55, 0.4),
+    0 0 0 2rpx rgba(255, 255, 255, 0.1),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3),
+    inset 0 -2rpx 4rpx rgba(0, 0, 0, 0.1);
   z-index: 100;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: shareBtnFloat 3s ease-in-out infinite;
   
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
+    box-shadow:
+      0 4rpx 16rpx rgba(212, 175, 55, 0.3),
+      0 0 0 2rpx rgba(255, 255, 255, 0.08),
+      inset 0 2rpx 4rpx rgba(255, 255, 255, 0.2);
   }
   
   .share-icon {
-    font-size: 32rpx;
+    width: 32rpx;
+    height: 32rpx;
     margin-right: 12rpx;
+    filter: brightness(0.1) drop-shadow(0 2rpx 4rpx rgba(0, 0, 0, 0.2));
+    animation: iconPulse 2s ease-in-out infinite;
   }
   
   .share-text {
-    font-size: 28rpx;
-    color: #fff;
-    font-weight: 500;
+    font-size: 26rpx;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 600;
+    letter-spacing: 1rpx;
+  }
+}
+
+@keyframes shareBtnFloat {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 
+      0 8rpx 32rpx rgba(212, 175, 55, 0.4),
+      0 0 0 2rpx rgba(255, 255, 255, 0.1),
+      inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    transform: translateY(-6rpx);
+    box-shadow: 
+      0 16rpx 40rpx rgba(212, 175, 55, 0.5),
+      0 0 0 2rpx rgba(255, 255, 255, 0.12),
+      inset 0 2rpx 4rpx rgba(255, 255, 255, 0.35);
   }
 }
 
 // ===== 动画 =====
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(220rpx) rotate(calc(var(--angle) * -1)) translateY(60rpx); }
+  to { opacity: 1; transform: translateX(220rpx) rotate(calc(var(--angle) * -1)) translateY(50rpx); }
 }
 
 // ===== 安全区域适配 =====
@@ -351,6 +487,6 @@ page {
   }
   
   .share-btn {
-    bottom: calc(80rpx + env(safe-area-inset-bottom));
+    bottom: calc(100rpx + env(safe-area-inset-bottom));
   }
 }

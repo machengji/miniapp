@@ -1,0 +1,7 @@
+<!-- Incense Canvas Component -->
+<canvas
+  id="incenseCanvas"
+  type="2d"
+  class="incense-canvas"
+  canvas-id="incenseCanvas"
+></canvas>

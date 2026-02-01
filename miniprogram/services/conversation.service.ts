@@ -35,6 +35,7 @@ class ConversationService {
    * 创建新对话
    */
   async createConversation(firstMessage: string, mood?: string, clarity?: number): Promise<string> {
+    console.log("[ConversationService] createConversation 开始");
     const db = wx.cloud.database();
     const now = Date.now();
     
@@ -52,23 +53,47 @@ class ConversationService {
       isArchived: false
     };
     
-    const result = await db.collection(this.DB_NAME).add({ data: conversation });
-    return result._id;
+    console.log("[ConversationService] 准备添加对话:", { title, preview: preview.substring(0, 20) });
+    
+    try {
+      const result = await db.collection(this.DB_NAME).add({ data: conversation });
+      console.log("[ConversationService] 对话创建成功, _id:", result._id);
+      return result._id;
+    } catch (err: any) {
+      console.error("[ConversationService] 对话创建失败:", err);
+      throw err;
+    }
   }
 
   /**
    * 获取对话列表
    */
   async getConversations(limit: number = 20): Promise<Conversation[]> {
+    console.log("[ConversationService] getConversations 开始");
     const db = wx.cloud.database();
     
-    const { data } = await db.collection(this.DB_NAME)
-      .where({ isArchived: false })
-      .orderBy('lastMessageTime', 'desc')
-      .limit(limit)
-      .get();
-    
-    return data as Conversation[];
+    try {
+      console.log("[ConversationService] 查询数据库:", this.DB_NAME);
+      const { data } = await db.collection(this.DB_NAME)
+        .where({ isArchived: false })
+        .orderBy('lastMessageTime', 'desc')
+        .limit(limit)
+        .get();
+      
+      console.log("[ConversationService] 查询结果:", data.length, "条记录");
+      if (data.length > 0) {
+        console.log("[ConversationService] 第一条对话:", { 
+          id: data[0]._id, 
+          title: data[0].title,
+          lastMessageTime: data[0].lastMessageTime 
+        });
+      }
+      
+      return data as Conversation[];
+    } catch (err: any) {
+      console.error("[ConversationService] getConversations 失败:", err);
+      return [];
+    }
   }
 
   /**
@@ -115,6 +140,9 @@ class ConversationService {
    * 批量保存消息（用于保存完整对话）
    */
   async saveMessages(conversationId: string, messages: ChatMessage[]): Promise<void> {
+    console.log("[ConversationService] saveMessages 开始, conversationId:", conversationId);
+    console.log("[ConversationService] 消息数量:", messages.length);
+    
     const db = wx.cloud.database();
     const now = Date.now();
     
@@ -125,22 +153,44 @@ class ConversationService {
       createTime: now
     }));
     
+    console.log("[ConversationService] 准备批量插入消息...");
+    
     // 云数据库不支持真正的批量插入，需要逐个添加
-    for (const msg of batch) {
-      await db.collection(this.MSG_DB_NAME).add({ data: msg });
+    let successCount = 0;
+    for (let i = 0; i < batch.length; i++) {
+      const msg = batch[i];
+      console.log(`[ConversationService] 插入消息 ${i + 1}/${batch.length}:`, { id: msg.id, role: msg.role });
+      try {
+        await db.collection(this.MSG_DB_NAME).add({ data: msg });
+        successCount++;
+        console.log(`[ConversationService] 消息 ${i + 1} 插入成功`);
+      } catch (err: any) {
+        console.error(`[ConversationService] 消息 ${i + 1} 插入失败:`, err);
+      }
     }
+    
+    console.log(`[ConversationService] 消息插入完成: ${successCount}/${batch.length}`);
     
     // 更新对话统计
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      await db.collection(this.DB_NAME).doc(conversationId).update({
-        data: {
-          lastMessageTime: now,
-          messageCount: messages.length,
-          preview: lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : '')
-        }
-      });
+      console.log("[ConversationService] 更新对话统计, lastMessage:", lastMessage.content && lastMessage.content.substring(0, 30));
+      try {
+        await db.collection(this.DB_NAME).doc(conversationId).update({
+          data: {
+            lastMessageTime: now,
+            messageCount: messages.length,
+            preview: lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : '')
+          }
+        });
+        console.log("[ConversationService] 对话统计更新成功");
+      } catch (err: any) {
+        console.error("[ConversationService] 对话统计更新失败:", err);
+        throw err;
+      }
     }
+    
+    console.log("[ConversationService] saveMessages 完成");
   }
 
   /**

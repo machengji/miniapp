@@ -31,7 +31,7 @@
     </view>
     
     <!-- 用户统计卡片 -->
-    <view class="stats-card" wx:if="{{stats.totalDreams > 0}}">
+    <view class="stats-card" wx:if="{{stats.totalDreams > 0}}" bindtap="goToReport">
       <view class="stat-item">
         <text class="stat-value">{{stats.totalDreams}}</text>
         <text class="stat-label">记录梦境</text>

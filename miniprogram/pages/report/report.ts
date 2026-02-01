@@ -12,27 +12,27 @@ Page({
     dominantMood: "-",
     streakDays: 0,
 
-    // 荣格 12 原型 (用于雷达图)
+    // 荣格 12 原型
     archetypes: [
-      { name: '天真者', value: 0, icon: '👶' },
-      { name: '孤儿', value: 0, icon: '🏃' },
-      { name: '英雄', value: 0, icon: '⚔️' },
-      { name: '照顾者', value: 0, icon: '🤱' },
-      { name: '探索者', value: 0, icon: '🔍' },
-      { name: '反叛者', value: 0, icon: '🔥' },
-      { name: '情人', value: 0, icon: '❤️' },
-      { name: '创造者', value: 0, icon: '🎨' },
-      { name: '小丑', value: 0, icon: '🃏' },
-      { name: '智者', value: 0, icon: '📚' },
-      { name: '魔术师', value: 0, icon: '🔮' },
-      { name: '统治者', value: 0, icon: '👑' }
+      { name: '天真者', value: 0, icon: '/images/archetypes/innocent.svg', key: 'innocent' },
+      { name: '孤儿', value: 0, icon: '/images/archetypes/orphan.svg', key: 'orphan' },
+      { name: '英雄', value: 0, icon: '/images/archetypes/hero.svg', key: 'hero' },
+      { name: '照顾者', value: 0, icon: '/images/archetypes/caregiver.svg', key: 'caregiver' },
+      { name: '探索者', value: 0, icon: '/images/archetypes/explorer.svg', key: 'explorer' },
+      { name: '反叛者', value: 0, icon: '/images/archetypes/rebel.svg', key: 'rebel' },
+      { name: '情人', value: 0, icon: '/images/archetypes/lover.svg', key: 'lover' },
+      { name: '创造者', value: 0, icon: '/images/archetypes/creator.svg', key: 'creator' },
+      { name: '小丑', value: 0, icon: '/images/archetypes/jester.svg', key: 'jester' },
+      { name: '智者', value: 0, icon: '/images/archetypes/sage.svg', key: 'sage' },
+      { name: '魔术师', value: 0, icon: '/images/archetypes/magician.svg', key: 'magician' },
+      { name: '统治者', value: 0, icon: '/images/archetypes/ruler.svg', key: 'ruler' }
     ],
 
     // 情绪分布
-    moodDistribution: [] as {mood: string, count: number, percentage: number}[]
+    moodDistribution: [] as {mood: string, count: number, percentage: number}[],
 
     // 反复出现的意象
-    recurrentSymbols: [] as string[]
+    recurrentSymbols: [] as string[],
 
     // 加载状态
     isLoading: true,
@@ -75,7 +75,8 @@ Page({
 
       // 3. 情绪分布
       const moodDistribution = this.calculateMoodDistribution(dreams);
-      const dominantMood = moodDistribution.length > 0 ? moodDistribution[0].mood : '-';
+      let dominantMood = moodDistribution.length > 0 ? moodDistribution[0].mood : '-';
+      if (dominantMood === 'unknown') dominantMood = '未分类';
 
       // 4. Persona/Shadow 计算
       const { personaPercentage, insight } = this.calculatePersonaShadow(dreams);
@@ -94,9 +95,6 @@ Page({
         recurrentSymbols: recurrentSymbols,
         isLoading: false
       });
-
-      // 渲染 Canvas
-      this.drawRadar(archetypeScores);
       
     } catch (err) {
       console.error('加载报告失败:', err);
@@ -124,18 +122,18 @@ Page({
   calculateArchetypeScores(dreams: any[]) {
     // 初始分数
     const scores = [
-      { name: '天真者', value: 20, icon: '👶', key: 'innocent' },
-      { name: '孤儿', value: 20, icon: '🏃', key: 'orphan' },
-      { name: '英雄', value: 20, icon: '⚔️', key: 'hero' },
-      { name: '照顾者', value: 20, icon: '🤱', key: 'caregiver' },
-      { name: '探索者', value: 20, icon: '🔍', key: 'explorer' },
-      { name: '反叛者', value: 20, icon: '🔥', key: 'rebel' },
-      { name: '情人', value: 20, icon: '❤️', key: 'lover' },
-      { name: '创造者', value: 20, icon: '🎨', key: 'creator' },
-      { name: '小丑', value: 20, icon: '🃏', key: 'jester' },
-      { name: '智者', value: 20, icon: '📚', key: 'sage' },
-      { name: '魔术师', value: 20, icon: '🔮', key: 'magician' },
-      { name: '统治者', value: 20, icon: '👑', key: 'ruler' }
+      { name: '天真者', value: 20, icon: '/images/archetypes/innocent.svg', key: 'innocent' },
+      { name: '孤儿', value: 20, icon: '/images/archetypes/orphan.svg', key: 'orphan' },
+      { name: '英雄', value: 20, icon: '/images/archetypes/hero.svg', key: 'hero' },
+      { name: '照顾者', value: 20, icon: '/images/archetypes/caregiver.svg', key: 'caregiver' },
+      { name: '探索者', value: 20, icon: '/images/archetypes/explorer.svg', key: 'explorer' },
+      { name: '反叛者', value: 20, icon: '/images/archetypes/rebel.svg', key: 'rebel' },
+      { name: '情人', value: 20, icon: '/images/archetypes/lover.svg', key: 'lover' },
+      { name: '创造者', value: 20, icon: '/images/archetypes/creator.svg', key: 'creator' },
+      { name: '小丑', value: 20, icon: '/images/archetypes/jester.svg', key: 'jester' },
+      { name: '智者', value: 20, icon: '/images/archetypes/sage.svg', key: 'sage' },
+      { name: '魔术师', value: 20, icon: '/images/archetypes/magician.svg', key: 'magician' },
+      { name: '统治者', value: 20, icon: '/images/archetypes/ruler.svg', key: 'ruler' }
     ];
 
     // 累加每条梦境的原型得分
@@ -216,7 +214,7 @@ Page({
   drawRadar(data: any[]) {
     const query = wx.createSelectorQuery();
     query.select('#radarCanvas')
-      .fields({ node: true, size:rect true })
+      .fields({ node: true, size: true })
       .exec((res: any) => {
         if (!res[0]) return;
         
@@ -356,7 +354,7 @@ Page({
     ctx.fillText(item.name, x, y);
   },
 
-  animateRadarLabels(ctx: any, centerX:ari: number, centerY: number, radius: number, data: any[]) {
+  animateRadarLabels(ctx: any, centerX: number, centerY: number, radius: number, data: any[]) {
     const sides = data.length;
     const angleStep = (Math.PI * 2) / sides;
     
@@ -479,6 +477,28 @@ Page({
   onNavBarHeightReady(e: any) {
     const { totalHeight } = e.detail;
     this.setData({ navBarHeight: totalHeight });
+  },
+
+  /**
+   * 导航栏高度就绪回调
+   */
+  onNavBarHeightReady(e: any) {
+    const { totalHeight } = e.detail;
+    this.setData({ navBarHeight: totalHeight });
+  },
+
+  /**
+   * 分享报告按钮点击
+   */
+  shareReport() {
+    wx.vibrateShort({ type: 'light' });
+    // 在小程序中，分享需要用户主动点击右上角分享按钮
+    // 这里显示一个提示
+    wx.showToast({
+      title: '请点击右上角菜单分享',
+      icon: 'none',
+      duration: 2000
+    });
   },
 
   /**

@@ -1,0 +1,75 @@
+/* Shop Page Styles */
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f6fa;
+  padding: 40rpx;
+}
+
+.header {
+  width: 100%;
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.incense-list,
+.cyber-section {
+  width: 100%;
+  margin-top: 60rpx;
+}
+
+.incense-item,
+.cyber-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.name {
+  font-size: 32rpx;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.price {
+  font-size: 28rpx;
+  color: #e74c3c;
+  margin-right: 20rpx;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 30rpx;
+}
+
+.unlock-btn {
+  width: 160rpx;
+  height: 60rpx;
+  background-color: #00ff9d;
+  color: #2c3e50;
+  font-size: 28rpx;
+  border: none;
+  border-radius: 30rpx;
+}

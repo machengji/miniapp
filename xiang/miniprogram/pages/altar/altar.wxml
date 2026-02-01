@@ -1,0 +1,14 @@
+<!-- Altar Page -->
+<view class="container">
+  <view class="altar-background">
+    <!-- incense-canvas component -->
+    <!-- TODO: Add incense-canvas component -->
+  </view>
+
+  <view class="controls">
+    <view class="ignite-hint">长按点火</view>
+    <view class="progress-bar">
+      <!-- TODO: Add burning progress bar -->
+    </view>
+  </view>
+</view>

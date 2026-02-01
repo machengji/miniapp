@@ -1,0 +1,25 @@
+/* Merit Popup Component Styles */
+.merit-popup {
+  position: absolute;
+  color: #ffd700;
+  font-size: 48rpx;
+  font-weight: bold;
+  text-shadow: 0 0 20rpx rgba(255, 215, 0, 0.8);
+  pointer-events: none;
+  animation: floatUp 2s ease-out forwards;
+}
+
+.merit-text {
+  display: block;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-200rpx) scale(1.2);
+    opacity: 0;
+  }
+}
