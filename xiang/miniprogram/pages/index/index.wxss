@@ -1,9 +1,10 @@
-/* Main Hall Page Styles */
+/* Main Hall Page Styles - 赛博禅意风格 */
 page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+  background: linear-gradient(180deg, #1a252f 0%, #2c3e50 50%, #34495e 100%);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 .container {
@@ -11,36 +12,75 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60rpx 40rpx;
+  padding: 80rpx 40rpx;
+  position: relative;
+}
+
+/* 顶部祥云装饰 - 模拟传统建筑 */
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.15) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* 添加微妙的水墨纹理背景 */
+.container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0%, transparent 70%);
+  background-size: 200rpx 200rpx;
+  pointer-events: none;
+  opacity: 0.3;
 }
 
 .temple-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 80rpx;
+  margin-bottom: 100rpx;
+  margin-top: 40rpx;
+  position: relative;
 }
 
 .title {
-  font-size: 72rpx;
+  font-size: 88rpx;
   font-weight: bold;
-  color: #f1c40f;
-  margin-bottom: 20rpx;
-  text-shadow: 0 4rpx 12rpx rgba(241, 196, 15, 0.3);
+  color: #d4af37;
+  margin-bottom: 24rpx;
+  text-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.5), 0 0 30rpx rgba(212, 175, 55, 0.3);
+  letter-spacing: 16rpx;
+;
 }
 
 .subtitle {
-  font-size: 28rpx;
-  color: #ecf0f1;
-  opacity: 0.8;
+  font-size: 32rpx;
+  color: #bdc3c7;
+  opacity: 0.9;
+  letter-spacing: 8rpx;
+  font-weight: 300;
 }
 
+/* 蒲团样式的祈福按钮 */
 .prayer-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 30rpx;
+  gap: 50rpx;
   width: 100%;
-  max-width: 650rpx;
+  max-width: 700rpx;
+  padding: 40rpx;
+  background: linear-gradient(135deg, rgba(44, 62, 80, 0.3) 0%, rgba(52, 73, 94, 0.3) 100%);
+  border-radius: 30rpx;
+  border: 2rpx solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.3), inset 0 2rpx 10rpx rgba(255, 255, 255, 0.05);
 }
 
 .prayer-item {
@@ -48,60 +88,108 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60rpx 40rpx;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 20rpx;
-  border: 2rpx solid rgba(241, 196, 15, 0.3);
-  transition: all 0.3s ease;
+  padding: 80rpx 50rpx;
+  background: linear-gradient(145deg, #3d4a5d 0%, #2c3e50 100%);
+  border-radius: 50%;
+  border: 3rpx solid rgba(212, 175, 55, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.4), 0 0 0 1rpx rgba(212, 175, 55, 0.2);
+  position: relative;
+}
+
+/* 蒲团纹理效果 */
+.prayer-item::before {
+  content: "";
+  position: absolute;
+  top: 10rpx;
+  left: 10rpx;
+  right: 10rpx;
+  bottom: 10rpx;
+  border: 1rpx solid rgba(212, 175, 55, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .prayer-item:active {
-  transform: scale(0.95);
-  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(0.95) translateY(5rpx);
+  background: linear-gradient(145deg, #4a5a70 0%, #3d4a5d 100%);
+  box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.3), 0 0 0 1rpx rgba(212, 175, 55, 0.3);
 }
 
 .prayer-icon {
-  font-size: 80rpx;
-  margin-bottom: 20rpx;
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+  filter: drop-shadow(0 4rpx 8rpx rgba(212, 175, 55, 0.3));
 }
 
 .prayer-name {
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: bold;
   color: #ecf0f1;
-  margin-bottom: 10rpx;
+  margin-bottom: 12rpx;
+  letter-spacing: 4rpx;
 }
 
 .prayer-desc {
-  font-size: 24rpx;
-  color: #bdc3c7;
+  font-size: 26rpx;
+  color: #95a5a6;
   text-align: center;
+  letter-spacing: 2rpx;
+  line-height: 1.6;
 }
 
+/* 功德牌匾样式的悬浮球 */
 .merit-float {
   position: fixed;
   right: 40rpx;
-  bottom: 160rpx;
+  bottom: 200rpx;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  padding: 20rpx 30rpx;
-  background-color: rgba(241, 196, 15, 0.9);
-  border-radius: 50rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.3);
+  padding: 30rpx 40rpx;
+  background: linear-gradient(145deg, #c0392b 0%, #8b1a1a 100%);
+  border-radius: 20rpx;
+  border: 4rpx solid #d4af37;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.5), inset 0 2rpx 10rpx rgba(255, 255, 255, 0.1);
+  animation: floatGentle 3s ease-in-out infinite;
+}
+
+/* 牌匾纹理效果 */
+.merit-float::before {
+  content: "";
+  position: absolute;
+  top: 6rpx;
+  left: 6rpx;
+  right: 6rpx;
+  bottom: 6rpx;
+  border: 2rpx solid rgba(212, 175, 55, 0.3);
+  border-radius: 12rpx;
+  pointer-events: none;
 }
 
 .merit-icon {
-  font-size: 40rpx;
-  margin-right: 10rpx;
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
 }
 
 .merit-text {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: bold;
-  color: #2c3e50;
+  color: #d4af37;
+  letter-spacing: 4rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.5);
 }
 
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10rpx);
+  }
+}
+
+/* 底部香案样式 */
 .footer {
   position: fixed;
   bottom: 0;
@@ -110,22 +198,46 @@ page {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding: 30rpx;
-  background-color: rgba(44, 62, 80, 0.95);
-  border-top: 1rpx solid rgba(255, 255, 255, 0.1);
+  padding: 4040rpx;
+  background: linear-gradient(0deg, rgba(26, 37, 47, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+  border-top: 4rpx solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.3);
+}
+
+/* 回纹装饰效果 */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(212, 175, 55, 0.1) 0rpx,
+    rgba(212, 175, 55, 0.1) 40rpx,
+    transparent 40rpx,
+    transparent 80rpx
+  );
+  pointer-events: none;
 }
 
 .footer-btn {
-  width: 200rpx;
-  height: 70rpx;
-  background-color: #f1c40f;
-  color: #2c3e50;
-  font-size: 28rpx;
+  width: 240rpx;
+  height: 88rpx;
+  background: linear-gradient(145deg, #d4af37 0%, #c9a227 100%);
+  color: #1a252f;
+  font-size: 32rpx;
   border: none;
-  border-radius: 35rpx;
+  border-radius: 10rpx;
   font-weight: bold;
+  letter-spacing: 4rpx;
+  box-shadow: 0 6rpx 20rpx rgba(212, 175, 55, 0.4), inset 0 2rpx 10rpx rgba(255, 255, 255, 0.3);
+  border: 3rpx solid #f1c40f;
 }
 
 .footer-btn:active {
-  background-color: #f39c12;
+  background: linear-gradient(145deg, #c9a227 0%, #b8860b 100%);
+  transform: translateY(2rpx);
+  box-shadow: 0 3rpx 10rpx rgba(212, 175, 55, 0.3), inset 0 2rpx 10rpx rgba(255, 255, 255, 0.2);
 }

@@ -1,5 +1,46 @@
-/* Incense Canvas Component Styles */
+/* Incense Canvas Component Styles - 青铜器风格 */
 .incense-canvas {
-  width: 750rpx;
-  height: 800rpx;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: linear-gradient(180deg, 
+    rgba(26, 37, 47, 0.3) 0%, 
+    rgba(44, 62, 80, 0.3) 50%,
+    rgba(52, 73, 94, 0.3) 100%
+  );
+}
+
+/* 香案木纹背景 */
+.incense-canvas::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(139, 69, 19, 0.08) 0rpx,
+    rgba(139, 69, 19, 0.08) 2rpx,
+    transparent 2rpx,
+    transparent 10rpx
+  );
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* 金色边框装饰 */
+.incense-canvas::after {
+  content: "";
+  position: absolute;
+  top: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: 20rpx;
+  border: 6rpx double rgba(212, 175, 55, 0.3);
+  border-radius: 10rpx;
+  pointer-events: none;
+  box-shadow: 
+    0 0 20rpx rgba(212, 175, 55, 0.2),
+    inset 0 0 20rpx rgba(0, 0, 0, 0.1);
 }

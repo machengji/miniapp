@@ -1,8 +1,32 @@
-/* Smoke Particle Component Styles */
+/* Smoke Particle Component Styles - 水墨晕染风格 */
 .smoke-particle {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.3);
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, 0.4) 0%, 
+    rgba(200, 200, 200, 0.3) 40%, 
+    rgba(150, 150, 150, 0.2) 70%, 
+    rgba(100, 100, 100, 0.1) 100%
+  );
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(4rpx);
+  box-shadow: 
+    0 0 10rpx rgba(255, 255, 255, 0.2),
+    0 0 20rpx rgba(200, 200, 200, 0.1);
+  transition: all 0.3s ease;
+  animation: smokeFloat 3s ease-out infinite;
+}
+
+@keyframes smokeFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-50rpx) translateX(10rpx) scale(1.2);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100rpx) translateX(-5rpx) scale(1.4);
+    opacity: 0;
+  }
 }

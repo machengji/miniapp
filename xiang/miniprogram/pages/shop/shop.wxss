@@ -1,75 +1,222 @@
-/* Shop Page Styles */
+/* Shop Page Styles - 博古架风格 */
 page {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(180deg, #fdf5e6 0%, #fff8dc 50%, #f5f5dc 100%);
 }
 
+/* 博古架背景纹理 */
 .container {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f5f6fa;
-  padding: 40rpx;
+  padding: 60rpx 40rpx;
+  position: relative;
+}
+
+/* 木纹背景效果 */
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(139, 69, 19, 0.03) 0rpx,
+    rgba(139, 69, 19, 0.03) 2rpx,
+    transparent 2rpx,
+    transparent 10rpx
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .header {
   width: 100%;
-  padding: 40rpx 0;
+  padding: 60rpx 40rpx;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* 香铺题匾样式 */
 .title {
-  font-size: 48rpx;
+  font-size: 64rpx;
   font-weight: bold;
-  color: #2c3e50;
+  color: #8b4513;
+  letter-spacing: 16rpx;
+  text-shadow: 
+    2rpx 2rpx 0rpx rgba(0, 0, 0, 0.1),
+    0 0 40rpx rgba(139, 69, 19, 0.2);
+  padding: 30rpx 80rpx;
+  border: 4rpx double #d4af37;
+  background: linear-gradient(145deg, #fff8dc 0%, #fdf5e6 100%);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
 }
 
 .incense-list,
 .cyber-section {
   width: 100%;
-  margin-top: 60rpx;
+  margin-top: 80rpx;
+  position: relative;
+  z-index: 1;
 }
 
+/* 架子分隔线 */
+.incense-list::before {
+  content: "";
+  position: absolute;
+  top: -40rpx;
+  left: 0;
+  right: 0;
+  height: 80rpx;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 69, 19, 0.2) 20%,
+    rgba(139, 69, 19, 0.3) 50%,
+    rgba(139, 69, 19, 0.2) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* 古董架样式的商品卡片 */
 .incense-item,
 .cyber-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 40rpx;
-  background-color: #ffffff;
-  border-radius: 20rpx;
-  margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  padding: 50rpx 60rpx;
+  background: linear-gradient(145deg, #faf0e6 0%, #f5f5dc 100%);
+  border-radius: 15rpx;
+  margin-bottom: 40rpx;
+  border: 3rpx solid rgba(139, 69, 19, 0.3);
+  box-shadow: 
+    0 8rpx 32rpx rgba(0, 0, 0, 0.15),
+    inset 0 2rpx 10rpx rgba(255, 255, 255, 0.5);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 架子装饰角标 */
+.incense-item::before,
+.cyber-item::before {
+  content: "";
+  position: absolute;
+  top: 10rpx;
+  left: 10rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-left: 3rpx solid #d4af37;
+  border-top: 3rpx solid #d4af37;
+}
+
+.incense-item::after,
+.cyber-item::after {
+  content: "";
+  position: absolute;
+  bottom: 10rpx;
+  right: 10rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-right: 3rpx solid #d4af37;
+  border-bottom: 3rpx solid #d4af37;
+}
+
+.incense-item:active,
+.cyber-item:active {
+  transform: translateY(3rpx);
+  box-shadow: 
+    0 4rpx 16rpx rgba(0, 0, 0, 0.1),
+    inset 0 2rpx 10rpx rgba(255, 255, 255, 0.3);
 }
 
 .name {
-  font-size: 32rpx;
-  color: #2c3e50;
+  font-size: 36rpx;
+  color: #4a3728;
   flex: 1;
+  letter-spacing: 4rpx;
+  font-weight: 500;
 }
 
 .price {
-  font-size: 28rpx;
-  color: #e74c3c;
-  margin-right: 20rpx;
+  font-size: 32rpx;
+  color: #c0392b;
+  margin-right: 40rpx;
+  letter-spacing: 4rpx;
+  font-weight: bold;
 }
 
 .section-title {
-  font-size: 36rpx;
+  font-size: 48rpx;
   font-weight: bold;
-  color: #2c3e50;
-  margin-bottom: 30rpx;
+  color: #8b4513;
+  margin-bottom: 50rpx;
+  letter-spacing: 12rpx;
+  text-align: center;
+  border-bottom: 4rpx double #d4af37;
+  padding-bottom: 30rpx;
 }
 
+/* �封印效果的解锁按钮 */
 .unlock-btn {
-  width: 160rpx;
-  height: 60rpx;
-  background-color: #00ff9d;
-  color: #2c3e50;
-  font-size: 28rpx;
-  border: none;
-  border-radius: 30rpx;
+  width: 200rpx;
+  height: 80rpx;
+  background: linear-gradient(145deg, #1abc9c 0%, #16a085 100%);
+  color: #d4af37;
+  font-size: 32rpx;
+  border: 4rpx double #d4af37;
+  border-radius: 50rpx;
+  font-weight: bold;
+  letter-spacing: 4rpx;
+  box-shadow: 
+    0 6rpx 20rpx rgba(0, 0, 0, 0.2),
+    inset 0 2rpx 10rpx rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+/* 印章效果 */
+.unlock-btn::before {
+  content: "印";
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  font-size: 20rpx;
+  color: rgba(212, 175, 55, 0.5);
+  border: 2rpx solid rgba(212, 175, 55, 0.5);
+  padding: 4rREX;
+  border-radius: 4rpx;
+}
+
+.unlock-btn:active {
+  background: linear-gradient(145deg, #16a085 0%, #138a75 100%);
+  transform: translateY(2rpx);
+  box-shadow: 
+    0 3rpx 10rpx rgba(0, 0, 0, 0.15),
+    inset 0 2rpx 10rpx rgba(255, 255, 255, 0.1);
+}
+
+/* 赛博电子烟特殊样式 */
+.cyber-item {
+  background: linear-gradient(145deg, #1a252f 0%, #2c3e50 100%);
+  border-color: rgba(0, 255, 157, 0.4);
+}
+
+.cyber-item .name,
+.cyber-item .price {
+  color: #00ff9d;
+  text-shadow: 0 0 20rpx rgba(0, 255, 157, 0.3);
+}
+
+.cyber-item .unlock-btn {
+  background: linear-gradient(145deg, #00ff9d 0%, #00ccff 100%);
+  color: #1a252f;
+  border-color: #d4af37;
+;
 }
